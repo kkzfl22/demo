@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>首页</title>
+ <!-- <script type="text/javascript" src="jquery/jquery-1.8/jquery-1.8.0.js"></script>-->
+  <script type="text/javascript" src="jquery/jquery-1.11.3/jquery-1.11.3.js"></script>
+  <script type="text/javascript" src="jquery/plug/pubsub/pubsub.js"></script>
+  <script type="text/javascript">
+  <!--
+	//实现1，进行回调方法，实现异步
+	function invoke(callback)
+	{
+		setTimeout(function () {   
+　　　　//进行回调方法			
+	　　	callback();			
+　　	}, 1000);  
+	}
+
+	function callbacks()
+	{
+		alert("这里是超时后的回调方法");
+	}
+
+	//invoke(callbacks());
+	//获取参数
+	function getaparam()
+	{
+		for(var item in arguments)
+		{
+			alert("key:"+item+";value:"+arguments[item]);
+		}
+	}
+	
+	//getaparam("1_1",22,33,4,"55");
+  //-->
+  </script>
+ </head>
+
+ <body>
+  <div id="triggclick_div" style="width:200px;height:100px;background-color:red;trigger"></div>
+ </body>
+
+ <script type="text/javascript">
+ <!--
+	// f1.on('done', f2);  
+
+	//实现2  基于事件驱动模式
+	function f1(){		
+		setTimeout(function () {  			
+	　　　//当发生了事件之后，使用trigger触发done事件
+			$("#triggclick_div").trigger("done"); 		
+	　　}, 1000);
+	}
+	
+	//事件调用
+	function f2()
+	{
+		alert("f1.f2");
+	}
+	
+	//绑定done事件
+	//$("#triggclick_div").on("done",f2);
+
+	//进行事件调用
+	//f1();
+
+
+	//实现3，基于发布/订阅，即观察者模式,使用jquery插件
+	jQuery.subscribe("done", f2); 
+	
+
+	function f11(){      
+	　　setTimeout(function () { 
+		
+	　　　　// f1的任务代码  		
+	　　　　jQuery.publish("done"); 
+		
+	　　}, 1000);      
+	} 
+	
+
+	f11();
+	//jQuery.unsubscribe("done", f2); 
+ //-->
+ </script>
+</html>

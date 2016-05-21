@@ -1,0 +1,89 @@
+jstat (JVM Statistics Monitoring Tool)是用于监视虚拟机各种运行状态信息的命令行工具
+它可以显示本地或者远程虚拟机进程中的类装载、内存、垃圾收集、JIT编译等运行数据
+
+jstat命令格式
+jstat [ option vmid [ interval [s|ms] [count]]]
+
+如果是本地虚拟机进程，VMID与LVMID是一致的,如果是远程虚拟机进程，那VMID的格式应当是:
+[protocol:] [//]lvmid[@hostname[:port]/servername]
+
+interval 和 count 代表查询间隔和次数 如果省略，则只查询一次
+
+option代表着用户希望查询的虚拟机信息，主要分为3类：类加载、垃圾收集、运行期编译状况
+
+jstat 工具主要选项 
+-class       监视类装载、卸载数量、总空间以及类装载所耗费的时间
+-gc          监视java堆状况，包括Eden区、两个survivor区、老年代、永久代等的容量、已用空间、GC时间合计等信息
+-gccapacity  监视内容与gc基本相同，但输出主要关注java堆各个区域使用到的最大、最小空间
+-gcutil      监视内容与-gc基本相同，但输出主要关注已使用空间点总空间的百分比
+-gccause     与-gcutil功能一样，但是会客外输出导致上一次GC产生的原因
+-gcnew       监视新生代GC状况
+-gcnewcapacity 监视内容与-gcnew基本相同，输出主要关注使用到的最大、最小空间
+-gcold         监视老年代GC状况
+-gcoldcapacity 监视内容与-gcold基本相同 ，输出主要关注使用到的最大、最小空间
+-gcpermcapacity 输出永久代使用到的最大、最小空间
+-compiler       输出JIT编译器编译过的方法、耗时等信息
+-printcompilation 输出已经被JIT编译的方法
+
+
+例
+C:\Users\Think>jstat -gc 6508
+ S0C    S1C    S0U    S1U      EC       EU        OC         OU       PC     PU
+   YGC     YGCT    FGC    FGCT     GCT
+10752.0 10752.0  0.0    0.0   64512.0   2580.7   171008.0     0.0     21504.0 25
+70.3      0    0.000   0      0.000    0.000
+
+
+
+C:\Users\Think>jstat -gcutil 6508
+  S0     S1     E      O      P     YGC     YGCT    FGC    FGCT     GCT
+  0.00   0.00   4.00   0.00  11.95      0    0.000     0    0.000    0.000
+ S0 S1 表示Survivor0,Survivor1区
+ E 代表Eden区
+ O 代表Old区
+ P 永久代（Permanent)
+ YGC Young gc
+ YGCT Young gc Time
+ FGC Full GC
+ FGCT full GC Time
+ GcT Gc time
+ 
+ 
+ 
+
+S0C：年轻代中第一个survivor（幸存区）的容量 (字节) 
+S1C：年轻代中第二个survivor（幸存区）的容量 (字节) 
+S0U：年轻代中第一个survivor（幸存区）目前已使用空间 (字节) 
+S1U：年轻代中第二个survivor（幸存区）目前已使用空间 (字节) 
+EC：年轻代中Eden（伊甸园）的容量 (字节) 
+EU：年轻代中Eden（伊甸园）目前已使用空间 (字节) 
+OC：Old代的容量 (字节) 
+OU：Old代目前已使用空间 (字节) 
+PC：Perm(持久代)的容量 (字节) 
+PU：Perm(持久代)目前已使用空间 (字节) 
+YGC：从应用程序启动到采样时年轻代中gc次数 
+YGCT：从应用程序启动到采样时年轻代中gc所用时间(s) 
+FGC：从应用程序启动到采样时old代(全gc)gc次数 
+FGCT：从应用程序启动到采样时old代(全gc)gc所用时间(s) 
+GCT：从应用程序启动到采样时gc用的总时间(s)
+NGCMN：年轻代(young)中初始化(最小)的大小 (字节)
+NGCMX：年轻代(young)的最大容量 (字节)
+NGC：年轻代(young)中当前的容量 (字节)
+OGCMN：old代中初始化(最小)的大小 (字节)
+OGCMX：old代的最大容量 (字节)
+OGC：old代当前新生成的容量 (字节)
+PGCMN：perm代中初始化(最小)的大小 (字节)
+PGCMX：perm代的最大容量 (字节)
+PGC：perm代当前新生成的容量 (字节)
+S0：年轻代中第一个survivor（幸存区）已使用的占当前容量百分比
+S1：年轻代中第二个survivor（幸存区）已使用的占当前容量百分比
+E：年轻代中Eden（伊甸园）已使用的占当前容量百分比
+O：old代已使用的占当前容量百分比
+P：perm代已使用的占当前容量百分比
+S0CMX：年轻代中第一个survivor（幸存区）的最大容量 (字节)
+S1CMX ：年轻代中第二个survivor（幸存区）的最大容量 (字节)
+ECMX：年轻代中Eden（伊甸园）的最大容量 (字节)
+DSS：当前需要survivor（幸存区）的容量 (字节)（Eden区已满）
+TT： 持有次数限制
+MTT ： 最大持有次数限制
+

@@ -1,0 +1,11 @@
+[GC[ParNew
+Desired survivor size 524288 bytes, new threshold 1 (max 15)
+- age   1:    1043848 bytes,    1043848 total
+: 5768K->1024K(9216K), 0.0034797 secs] 5768K->1171K(19456K), 0.0035159 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+Heap
+ par new generation   total 9216K, used 5286K [0x00000000f9a00000, 0x00000000fa400000, 0x00000000fa400000)
+  eden space 8192K,  52% used [0x00000000f9a00000, 0x00000000f9e29980, 0x00000000fa200000)
+  from space 1024K, 100% used [0x00000000fa300000, 0x00000000fa400000, 0x00000000fa400000)
+  to   space 1024K,   0% used [0x00000000fa200000, 0x00000000fa200000, 0x00000000fa300000)
+ concurrent mark-sweep generation total 10240K, used 147K [0x00000000fa400000, 0x00000000fae00000, 0x00000000fae00000)
+ concurrent-mark-sweep perm gen total 21248K, used 2576K [0x00000000fae00000, 0x00000000fc2c0000, 0x0000000100000000)

@@ -1,0 +1,15 @@
+[INFO][2015-08-14 15:54:19,774] [0] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:47)] [main]  jvm.four.visualVM.BtraceTest - a:+b79623499
+[INFO][2015-08-14 15:59:35,086] [315312] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:47)] [main]  jvm.four.visualVM.BtraceTest - a:+b86883356
+[INFO][2015-08-14 16:00:13,689] [353915] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:47)] [main]  jvm.four.visualVM.BtraceTest - a:+b124925
+[INFO][2015-08-14 16:14:24,772] [1204998] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:47)] [main]  jvm.four.visualVM.BtraceTest - a:+b97734139
+[INFO][2015-08-14 16:22:48,794] [1709020] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:47)] [main]  jvm.four.visualVM.BtraceTest - a:+b12632571
+[INFO][2015-08-14 16:23:07,537] [1727763] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:47)] [main]  jvm.four.visualVM.BtraceTest - a:+b30858048
+[INFO][2015-08-14 16:29:48,972] [2129198] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:47)] [main]  jvm.four.visualVM.BtraceTest - a:+b74048263
+[INFO][2015-08-14 16:30:19,493] [2159719] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:47)] [main]  jvm.four.visualVM.BtraceTest - a:+b18751506
+[INFO][2015-08-14 16:39:21,984] [2702210] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:47)] [main]  jvm.four.visualVM.BtraceTest - a:+b16936987
+[INFO][2015-08-14 16:40:15,624] [2755850] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:47)] [main]  jvm.four.visualVM.BtraceTest - a:+b69947345
+[INFO][2015-08-14 16:40:52,834] [1] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:47)] [main]  jvm.four.visualVM.BtraceTest - a:+b16961872
+[INFO][2015-08-14 22:13:48,034] [0] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:53)] [main]  jvm.four.visualVM.BtraceTest - a:+b92073592
+[INFO][2015-08-14 22:14:13,277] [25243] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:53)] [main]  jvm.four.visualVM.BtraceTest - a:+b75959257
+[INFO][2015-08-14 22:29:08,637] [920603] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:53)] [main]  jvm.four.visualVM.BtraceTest - a:+b65455039
+[INFO][2015-08-14 22:35:10,702] [1] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:53)] [main]  jvm.four.visualVM.BtraceTest - a:+b85932135

@@ -1,0 +1,13 @@
+Java HotSpot(TM) 64-Bit Server VM warning: ignoring option HandlePromotionFailure; support was removed in 6.0_24
+[GC[ParNew: 7343K->657K(9216K), 0.0052701 secs] 7343K->4753K(19456K), 0.0053017 secs] [Times: user=0.06 sys=0.02, real=0.01 secs] 
+[GC[ParNew: 6978K->124K(9216K), 0.0006035 secs] 11074K->4894K(19456K), 0.0006183 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+Heap
+ par new generation   total 9216K, used 2254K [0x00000000f9a00000, 0x00000000fa400000, 0x00000000fa400000)
+  eden space 8192K,  26% used [0x00000000f9a00000, 0x00000000f9c14820, 0x00000000fa200000)
+  from space 1024K,  12% used [0x00000000fa200000, 0x00000000fa21f230, 0x00000000fa300000)
+  to   space 1024K,   0% used [0x00000000fa300000, 0x00000000fa300000, 0x00000000fa400000)
+ tenured generation   total 10240K, used 4770K [0x00000000fa400000, 0x00000000fae00000, 0x00000000fae00000)
+   the space 10240K,  46% used [0x00000000fa400000, 0x00000000fa8a88b0, 0x00000000fa8a8a00, 0x00000000fae00000)
+ compacting perm gen  total 21248K, used 2575K [0x00000000fae00000, 0x00000000fc2c0000, 0x0000000100000000)
+   the space 21248K,  12% used [0x00000000fae00000, 0x00000000fb083f78, 0x00000000fb084000, 0x00000000fc2c0000)
+No shared spaces configured.

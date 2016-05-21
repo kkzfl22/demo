@@ -1,0 +1,2 @@
+[INFO][2015-08-18 23:08:21,931] [0] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:56)] [main]  jvm.four.visualVM.BtraceTest - a:+b21895263
+[INFO][2015-08-18 23:17:48,639] [0] [com.liujun.jvm.four.visualVM.BtraceTest.add(BtraceTest.java:56)] [main]  jvm.four.visualVM.BtraceTest - a:+b90523804

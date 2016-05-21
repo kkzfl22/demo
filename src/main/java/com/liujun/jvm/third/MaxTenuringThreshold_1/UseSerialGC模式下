@@ -1,0 +1,21 @@
+-XX:+UseSerialGC 使用Serial + Serial Old组合进行内存回收
+
+[GC[DefNew
+Desired survivor size 524288 bytes, new threshold 1 (max 1)
+- age   1:     913368 bytes,     913368 total
+: 5512K->891K(9216K), 0.0033484 secs] 5512K->4987K(19456K), 0.0033944 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+[GC[DefNew
+Desired survivor size 524288 bytes, new threshold 1 (max 1)
+- age   1:        136 bytes,        136 total
+: 5072K->0K(9216K), 0.0012349 secs] 9168K->4987K(19456K), 0.0012476 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+Heap
+ def new generation   total 9216K, used 4260K [0x00000000f9a00000, 0x00000000fa400000, 0x00000000fa400000)
+  eden space 8192K,  52% used [0x00000000f9a00000, 0x00000000f9e28fd0, 0x00000000fa200000)
+  from space 1024K,   0% used [0x00000000fa200000, 0x00000000fa200088, 0x00000000fa300000)
+  to   space 1024K,   0% used [0x00000000fa300000, 0x00000000fa300000, 0x00000000fa400000)
+ tenured generation   total 10240K, used 4987K [0x00000000fa400000, 0x00000000fae00000, 0x00000000fae00000)
+   the space 10240K,  48% used [0x00000000fa400000, 0x00000000fa8ded68, 0x00000000fa8dee00, 0x00000000fae00000)
+ compacting perm gen  total 21248K, used 2575K [0x00000000fae00000, 0x00000000fc2c0000, 0x0000000100000000)
+   the space 21248K,  12% used [0x00000000fae00000, 0x00000000fb083f10, 0x00000000fb084000, 0x00000000fc2c0000)
+No shared spaces configured.
+

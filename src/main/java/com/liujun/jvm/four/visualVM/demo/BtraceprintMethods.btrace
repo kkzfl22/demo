@@ -1,0 +1,14 @@
+import com.sun.btrace.annotations.*;
+import static com.sun.btrace.BTraceUtils.*;
+
+
+
+
+
+    @OnMethod(clazz="/com\\.liujun\\.jvm\\.four\\..*/",method="/.*/")
+public static void allmehods(@ProbeClassName String probeClass,@ProbeMethodName String method)
+{
+	print(Strings.strcat("enable:\t",probeClass));
+    print("\t");
+	println(Strings.strcat(".",method));
+}

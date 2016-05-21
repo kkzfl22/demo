@@ -1,0 +1,23 @@
+     此针对代码进行打印方法参数信息和返回值
+ @OnMethod(
+    clazz="com.liujun.jvm.four.visualVM.BtraceTest",
+    method="add",
+    location=@Location(Kind.RETURN)
+    )
+    
+    
+    public static void func(@Self com.liujun.jvm.four.visualVM.BtraceTest instance,int a,int b,@Return int result)
+    {
+        println("调用堆栈");
+        jstack();
+        println(strcat("方法参数A:",str(a)));
+        println(strcat("方法参数B:",str(b)));
+        println(strcat("方法结果:",str(result)));    
+    }
+    
+    获取属性的信息
+    
+    
+    
+    
+    

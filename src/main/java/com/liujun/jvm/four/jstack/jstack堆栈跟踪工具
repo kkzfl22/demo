@@ -1,0 +1,126 @@
+jstack (Stack Trace for Java) 命令用于生成虚拟机当前时刻的线程快照（一般称为threaddump 或者 javacore文件).
+
+线程快照就是当前虚拟机内每一条线程正在执行的方法堆栈集合，
+生成线程快照的主要目的是定位线程出现长时间停顿的原因，如线程死锁、死循环、请求外部资源导致的长时间等待等都是导致线程长时间停顿的常见原因
+
+jstack [option] vmid
+
+主要选项
+-F    当正常输出的请求不被呼应时，强制输出线程堆栈
+-l    除堆栈外，显示关于锁的附加信息
+-m     如果调用本地方法的话，可以显示c/c++的堆栈
+
+
+
+
+
+例如：
+C:\Users\Think>jps -l
+3068 com.liujun.jvm.four.jstack.RunJstack
+2688
+1568 sun.tools.jps.Jps
+
+C:\Users\Think>jstack -l 3068
+2015-08-08 11:40:43
+Full thread dump Java HotSpot(TM) 64-Bit Server VM (24.79-b02 mixed mode):
+
+"Service Thread" daemon prio=6 tid=0x0000000010cc0800 nid=0x1cac runnable [0x000
+0000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+        - None
+
+"C2 CompilerThread1" daemon prio=10 tid=0x0000000010cba800 nid=0x1ac4 waiting on
+ condition [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+        - None
+
+"C2 CompilerThread0" daemon prio=10 tid=0x0000000010cb4000 nid=0x1c30 waiting on
+ condition [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+        - None
+
+"Attach Listener" daemon prio=10 tid=0x0000000010cae800 nid=0xc94 waiting on con
+dition [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+        - None
+
+"Signal Dispatcher" daemon prio=10 tid=0x0000000010cae000 nid=0x1dfc runnable [0
+x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+   Locked ownable synchronizers:
+        - None
+
+"Finalizer" daemon prio=8 tid=0x000000000262c000 nid=0x1bd4 in Object.wait() [0x
+0000000011fbf000]
+   java.lang.Thread.State: WAITING (on object monitor)
+        at java.lang.Object.wait(Native Method)
+        - waiting on <0x00000007ac484858> (a java.lang.ref.ReferenceQueue$Lock)
+        at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:135)
+        - locked <0x00000007ac484858> (a java.lang.ref.ReferenceQueue$Lock)
+        at java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:151)
+        at java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:209)
+
+   Locked ownable synchronizers:
+        - None
+
+"Reference Handler" daemon prio=10 tid=0x000000000fcf1000 nid=0x182c in Object.w
+ait() [0x0000000011eae000]
+   java.lang.Thread.State: WAITING (on object monitor)
+        at java.lang.Object.wait(Native Method)
+        - waiting on <0x00000007ac484470> (a java.lang.ref.Reference$Lock)
+        at java.lang.Object.wait(Object.java:503)
+        at java.lang.ref.Reference$ReferenceHandler.run(Reference.java:133)
+        - locked <0x00000007ac484470> (a java.lang.ref.Reference$Lock)
+
+   Locked ownable synchronizers:
+        - None
+
+"main" prio=6 tid=0x000000000259c800 nid=0x17c8 waiting on condition [0x00000000
+0284f000]
+   java.lang.Thread.State: TIMED_WAITING (sleeping)
+        at java.lang.Thread.sleep(Native Method)
+        at com.liujun.jvm.four.jstack.RunJstack.main(RunJstack.java:6)
+
+   Locked ownable synchronizers:
+        - None
+
+"VM Thread" prio=10 tid=0x000000000fced800 nid=0x1f2c runnable
+
+"GC task thread#0 (ParallelGC)" prio=6 tid=0x00000000025b2800 nid=0x858 runnable
+
+
+"GC task thread#1 (ParallelGC)" prio=6 tid=0x00000000025b4000 nid=0x1dc8 runnabl
+e
+
+"GC task thread#2 (ParallelGC)" prio=6 tid=0x00000000025b6000 nid=0x1e90 runnabl
+e
+
+"GC task thread#3 (ParallelGC)" prio=6 tid=0x00000000025b7800 nid=0x468 runnable
+
+
+"GC task thread#4 (ParallelGC)" prio=6 tid=0x00000000025bb000 nid=0x18b8 runnabl
+e
+
+"GC task thread#5 (ParallelGC)" prio=6 tid=0x00000000025bc000 nid=0x56c runnable
+
+
+"GC task thread#6 (ParallelGC)" prio=6 tid=0x00000000025bd800 nid=0x1f74 runnabl
+e
+
+"GC task thread#7 (ParallelGC)" prio=6 tid=0x00000000025bf000 nid=0x18d0 runnabl
+e
+
+"VM Periodic Task Thread" prio=10 tid=0x0000000010cec000 nid=0x1b58 waiting on c
+ondition
+
+JNI global references: 111
+

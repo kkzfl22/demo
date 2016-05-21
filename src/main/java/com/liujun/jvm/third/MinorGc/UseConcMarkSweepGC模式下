@@ -1,0 +1,10 @@
+-XX:+UseConcMarkSweepGC 使用ParNew + CMS + Serial Old的收集器组合进行内存回收
+
+[GC[ParNew: 7304K->674K(9216K), 0.0033652 secs] 7304K->6820K(19456K), 0.0034013 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] 
+Heap
+ par new generation   total 9216K, used 4936K [0x00000000f9a00000, 0x00000000fa400000, 0x00000000fa400000)
+  eden space 8192K,  52% used [0x00000000f9a00000, 0x00000000f9e29788, 0x00000000fa200000)
+  from space 1024K,  65% used [0x00000000fa300000, 0x00000000fa3a8af0, 0x00000000fa400000)
+  to   space 1024K,   0% used [0x00000000fa200000, 0x00000000fa200000, 0x00000000fa300000)
+ concurrent mark-sweep generation total 10240K, used 6146K [0x00000000fa400000, 0x00000000fae00000, 0x00000000fae00000)
+ concurrent-mark-sweep perm gen total 21248K, used 2576K [0x00000000fae00000, 0x00000000fc2c0000, 0x0000000100000000)

@@ -1,0 +1,13 @@
+ jps [ options ] [hostid]
+ 
+ options 主要选项
+ -q 只输出LVMID,省略主类的名称
+ -m 输出虚拟机进程启动时传递给主类main()函数的参数
+ -l 输出主类的全名，如果进程执行的是jar包，输出jar路径
+ -v 输出虚拟机进程启动时JVM参数
+ 
+ 例如：
+ C:\Users\Think>jps -l
+3704 sun.tools.jps.Jps
+1752 D:\java\softtools\sts-bundle\sts-3.7.0.RELEASE\\plugins/org.eclipse.equinox
+.launcher_1.3.100.v20150511-1540.jar

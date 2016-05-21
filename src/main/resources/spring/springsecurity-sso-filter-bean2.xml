@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security" xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+	<http pattern="/js/**" security="none" />
+	<http pattern="/jsp/security/login.jsp" security="none" />
+	<http pattern="/jsp/security/notsecurity.jsp" security="none" />
+	<http pattern="/jsp/security/sessiontimeout.jsp" security="none" />
+
+	<!-- entry-point-ref="authenticationProcessingFilterEntryPoint" 使用sso的单点登陆页面来替代现有的登陆页面 -->
+	<http use-expressions="true" entry-point-ref="casAuthEntryPoint" access-denied-page="/jsp/security/notsecurity.jsp">
+		<logout />
+		<!-- 实现免登陆验证 -->
+		<remember-me />
+		<session-management invalid-session-url="/jsp/security/sessiontimeout.jsp">
+			<concurrency-control max-sessions="30" error-if-maximum-exceeded="true" />
+		</session-management>
+		<custom-filter ref="casFilter" position="CAS_FILTER" />
+		<custom-filter ref="securityFilter" before="FILTER_SECURITY_INTERCEPTOR" />
+		<custom-filter ref="singleLogoutFilter" before="CAS_FILTER" />
+		<custom-filter ref="requestSingleLogoutFilter" before="LOGOUT_FILTER" />
+	</http>
+
+	<!-- 认证过滤器 -->
+	<beans:bean id="securityFilter" class="com.liujun.framework.springsecurity.filter.MySecurityFilter">
+		<!-- 用户拥有的权限 -->
+		<beans:property name="authenticationManager" ref="myAuthenticationManager" />
+		<!-- 用户是否拥有所请求资源的权限 -->
+		<beans:property name="accessDecisionManager" ref="myAccessDecisionManager" />
+		<!-- 资源与权限对应关系 -->
+		<beans:property name="securityMetadataSource" ref="mySecurityMetadataSource" />
+	</beans:bean>
+
+	<!-- 实现了UserDetailsService的Bean -->
+	<authentication-manager alias="myAuthenticationManager">
+		<authentication-provider user-service-ref="myUserDetailServiceImpl" />
+	</authentication-manager>
+
+	<!-- 进行用户权限加载 -->
+	<beans:bean id="myUserDetailServiceImpl" class="com.liujun.framework.springsecurity.service.impl.selfsecurity.MyUserDetailsService">
+	</beans:bean>
+
+	<!-- 是否拥有所请求资源的权限 -->
+	<beans:bean id="myAccessDecisionManager" class="com.liujun.framework.springsecurity.service.impl.selfsecurity.MyAccessDecisionManager"></beans:bean>
+
+	<!-- 加载资源与权限的对应关系 -->
+	<beans:bean id="mySecurityMetadataSource" class="com.liujun.framework.springsecurity.service.impl.selfsecurity.MySecurityMetadataSource">
+		<beans:constructor-arg name="resourceService" ref="myResourceServiceImpl"></beans:constructor-arg>
+	</beans:bean>
+
+
+	<!-- 注销客户端 -->
+	<beans:bean id="singleLogoutFilter" class="org.jasig.cas.client.session.SingleSignOutFilter" />
+
+	<!-- 注销服务器端 -->
+	<beans:bean id="requestSingleLogoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
+		<beans:constructor-arg value="http://www.liujun.com:8989/cas/logout" />
+		<beans:constructor-arg>
+			<beans:bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler" />
+		</beans:constructor-arg>
+		<beans:property name="filterProcessesUrl" value="/j_spring_cas_security_logout" />
+	</beans:bean>
+
+	<!-- 进行cas的过滤器操作 -->
+	<beans:bean id="casFilter" class="org.springframework.security.cas.web.CasAuthenticationFilter">
+		<beans:property name="authenticationManager" ref="authenticationManager" />
+	</beans:bean>
+
+	<!-- 权限列表信息 -->
+	<authentication-manager alias="authenticationManager">
+		<authentication-provider ref="casAuthenticationProvider" />
+	</authentication-manager>
+
+	<!-- 用户自定义权限代码实现 -->
+	<beans:bean id="casAuthenticationUserDetailsService" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+		<beans:property name="userDetailsService">
+			<beans:ref bean="myUserDetailServiceImpl" />
+		</beans:property>
+	</beans:bean>
+
+	<!-- 使用cas来进行检查 -->
+	<beans:bean id="casAuthenticationProvider" class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
+		<beans:property name="authenticationUserDetailsService" ref="casAuthenticationUserDetailsService" />
+		<beans:property name="serviceProperties" ref="casService" />
+		
+		<beans:property name="ticketValidator">
+			<beans:bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+				<beans:constructor-arg index="0" value="http://www.liujun.com:8989/cas/" />
+			</beans:bean>
+		</beans:property>
+		<beans:property name="key" value="an_id_for_this_auth_provider_only" />
+	</beans:bean>
+
+
+	<!-- AuthenticationEntryPoint的实现类用来将授权失败相关的异常转换成正确的行为——例如将未认证的用户重定向到登录页或者给用户展现出缺乏相应权限的出错页。 -->
+	<beans:bean id="casAuthEntryPoint" class="org.springframework.security.cas.web.CasAuthenticationEntryPoint">
+		<beans:property name="loginUrl" value="http://www.liujun.com:8989/cas/login" />
+		<beans:property name="serviceProperties" ref="casService" />
+	</beans:bean>
+
+	<!-- 教训啊！必须到/j_spring_cas_security_check来进行权限检查 -->
+	<!-- 登陆完成，通过此配制来返回指定页面 -->
+	<beans:bean id="casService" class="org.springframework.security.cas.ServiceProperties">
+		<beans:property name="service" value="http://www.liujun.com:8080/demo/j_spring_cas_security_check" />
+	</beans:bean>
+
+
+</beans:beans>

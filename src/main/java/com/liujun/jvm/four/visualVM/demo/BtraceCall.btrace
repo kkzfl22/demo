@@ -1,0 +1,17 @@
+import com.sun.btrace.annotations.*;
+import static com.sun.btrace.BTraceUtils.*;
+
+
+
+
+打印所有BtraceTest类中调用的方法
+@OnMethod(clazz="com.liujun.jvm.four.visualVM.BtraceTest",    method="/.*/",    
+	            location=@Location(value=Kind.CALL,clazz="/.*/", method="/.*/"))    
+    public static void method(@Self com.liujun.jvm.four.visualVM.BtraceTest instance,@TargetMethodOrField String method, @ProbeMethodName String probeMethod)
+    {
+        println("调用堆栈");
+        jstack();
+        println(strcat("方法参数@TargetMethodOrField \t :",str(method)));
+        println(strcat("方法参数@ProbeMethodName \t:",str(probeMethod)));
+       // println(strcat("方法结果:",str(result)));    
+    }

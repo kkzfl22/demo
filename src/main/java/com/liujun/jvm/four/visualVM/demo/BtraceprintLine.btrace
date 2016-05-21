@@ -1,0 +1,17 @@
+import com.sun.btrace.annotations.*;
+import static com.sun.btrace.BTraceUtils.*;
+
+
+
+
+//import com.sun.btrace.AnyType;
+
+//通过ArrayType数组进行打印调用 方法信息
+@OnMethod(clazz="com.liujun.jvm.four.visualVM.BtraceTest",    method="/.*/",    
+	            location=@Location(value=Kind.CALL,clazz="/.*/", method="/.*/"))    
+    public static void method(@Self Object self, @ProbeMethodName String pmn, AnyType[] args)
+    {
+        println("调用堆栈");
+        printArray(args);
+       // println(strcat("方法结果:",str(result)));    
+    }

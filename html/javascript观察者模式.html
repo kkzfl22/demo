@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <title> New Document </title>
+  <meta name="Generator" content="EditPlus">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+<script type="text/javascript">
+<!--
+
+	//实例对象1
+	var insta1 = function(){
+	
+		this.update = function(param,callbackfun){
+			console.log("insta1 start");
+
+			console.log("insta1 param:"+param);
+
+			//调用回调方法
+			callbackfun.callback();			
+		}		
+	}
+	
+	//实例对象2
+	var insta2 = function(){
+		this.update = function(param,callbackfun){
+			console.log("inst2 start");
+			console.log("inst2 param:"+param);
+
+			//调用回调方法
+			callbackfun.callback();	
+		}
+	}
+	
+	//观察者监听实现
+	var listenObj = function(){
+		var objlisten = [];
+
+		//添加监听者对象
+		this.addlisten = function(listen)
+		{
+			objlisten.push(listen);
+		}
+		
+		//设置方法，在监听对象完成后进行调用
+		this.callback = function()
+		{
+			console.log("listen rollback");
+		}
+
+		//当发生问题时通知所有观察对象
+		this.notiflyListen = function()
+		{
+			for(var listen in objlisten)
+			{
+				objlisten[listen].update("send notifly",this);
+			}
+		}
+	}
+
+	function main()
+	{	
+		//被观观察通知对象
+		var instobj1 = new insta1();
+		var instobj2 = new insta2();
+		//通知被观察者对象
+		var listObj = new listenObj();
+		
+		//加入观察者对象
+		listObj.addlisten(instobj1);
+		listObj.addlisten(instobj2);
+		
+		//发生通知
+		listObj.notiflyListen();
+
+	}
+		
+
+	main();
+
+
+//-->
+</script>
+
+
+ </head>
+
+ <body>
+  
+ </body>
+</html>

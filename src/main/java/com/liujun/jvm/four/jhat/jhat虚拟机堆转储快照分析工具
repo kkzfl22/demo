@@ -1,0 +1,5 @@
+Sun JDK提供jhat(JVM Heap Analysis Tool)命令与jmap搭配使用,来分析jmap生成的堆转储快照
+
+格式
+jhat 文件
+文件为jmap生成的文件路径

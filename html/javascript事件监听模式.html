@@ -1,0 +1,85 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <title>patten</title>
+  <meta name="Generator" content="EditPlus">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+<script type="text/javascript">
+<!--
+
+	//相互传递的event对象
+	var event = function(obj)
+	{
+		var obj;
+		this.obj = obj;
+		this.getObj = function()
+		{
+			return this.obj;
+		}
+	}
+
+	//事件处理对象
+	var eventProc = function()
+	{
+		this.proc = function(events)
+		{
+			console.log("事件处理对象开始运行");
+			var procObj = events.getObj();
+			procObj.callback();
+		}
+	}
+
+	//事件发生对象
+	var sendEvent = function()
+	{
+		var proct;
+
+		this.callback = function()
+		{
+			console.log("事件处理完成后,调用回调函数!");
+		}
+
+		this.sendEvent = function()
+		{
+			console.log("当前发生了事件");
+			var events = new event(this);
+			//调用处理对象
+			this.proct.proc(events);
+		}
+
+		this.setProc = function(proc)
+		{
+			this.proct = proc;
+		}
+	}
+
+	function main()
+	{
+		//1，创建事件处理对象
+		var eventprocess = new eventProc();
+		//2, 创建事件发生对象
+		var send = new sendEvent();
+		
+		//为事件发生对象设置事件处理对象信息
+		send.setProc(eventprocess);
+		
+		//发生事件
+		send.sendEvent();
+	}
+
+
+	main();
+
+
+//-->
+</script>
+
+
+ </head>
+
+ <body>
+  
+ </body>
+</html>

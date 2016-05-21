@@ -1,0 +1,20 @@
+import com.sun.btrace.annotations.*;
+import static com.sun.btrace.BTraceUtils.*;
+
+
+
+
+//对带有同步关系字synchronized之前和之后的进行操作
+@OnMethod(clazz="/com\\.liujun\\.jvm\\.four\\..*/",method="/.*/",location=@Location(value=Kind.SYNC_ENTRY,where=Where.AFTER))
+public static void afterMethods(Object obj)
+{
+        println(Strings.strcat("after synchronized entry:",str(obj)));
+		println(Strings.strcat("after synchronized entry:",identityStr(obj)));
+}
+
+@OnMethod(clazz="/com\\.liujun\\.jvm\\.four\\..*/",method="/.*/",location=@Location(value=Kind.SYNC_EXIT))
+public static void exitMethos(Object obj)
+{
+    println(Strings.strcat("before synchronized exit:",str(obj)));
+	println(Strings.strcat("before synchronized exit:",identityStr(obj)));
+}

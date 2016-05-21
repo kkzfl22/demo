@@ -1,0 +1,11 @@
+jinfo(configuration info for java)的作用是实时查看和调整虚拟机各项参数
+
+-v 可以查看虚拟机启动时显示指定的参数列表
+
+对于jdk1.6以及以上版本可以通过java -XX:+PrintFlagsFinal查看参数默认值也是一个很好的选择
+
+jinfo对于windows平台功能仍然有较大限制，只提供了最基本的-flag选项
+
+
+jinfo命令格式:
+jinfo [ option ] pid
