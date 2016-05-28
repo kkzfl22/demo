@@ -7,83 +7,69 @@ import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 
+import com.liujun.io.user.impl.CamelNameLineProcess;
+
 public class DataBaseTableToEntry {
-	
+
 	/**
 	 * 换行符
 	 */
-	private static final String LINE = "\r\n";
-	
+	public static final String LINE = "\r\n";
+
 	/**
 	 * 读取文件将将列中的首字母大写
+	 * 
 	 * @param path
 	 */
-	public void readToBig(String path)
-	{
+	public void readToBig(String path, LineProcessInf lineProcess) {
 		FileReader read = null;
 		BufferedReader bufRead = null;
-		
+
 		try {
 			read = new FileReader(path);
 			bufRead = new BufferedReader(read);
 			String line = null;
-			String[] column = null; 
-			
+
 			String out = null;
-			String name = null;
-			
-			while((line = bufRead.readLine()) != null)
-			{
-				column = line.split("\t");
-				
-				out =   "\t" + "/**"+LINE;
-				out +=  "\t" + " * " + column[0] +LINE;
-				out +=  "\t" + " */"  +LINE;
-				
-				out += "\tprivate ";
-				if("整数".equals(column[2]))
-				{
-					out += " int ";
-				}
-				else
-				{
-					out += " String ";
-				}
-				
-				name = column[1];
-				while(name.indexOf("_") != -1)
-				{
-					String buffix = name.substring(0,name.indexOf("_"));
-					String end = name.substring(name.indexOf("_")+1).substring(0,1).toUpperCase() + name.substring(name.indexOf("_")+1).substring(1);
-				
-					name = buffix + end;
-				}
-				
-				System.out.println(name);
-				
-				out += name+";"+LINE ;	
-				
-				//System.out.println(out);
+
+			while ((line = bufRead.readLine()) != null) {
+				// 进行行数据处理
+				out = lineProcess.processLine(line);
+
+				System.out.print(out);
+
 			}
-			
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		finally
-		{
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
 			IOUtils.closeQuietly(bufRead);
 			IOUtils.closeQuietly(read);
 		}
-		
+
 	}
-	
+
 	public static void main(String[] args) {
-		String path = DataBaseTableToEntry.class.getClassLoader().getResource("com/liujun/io/user/").getPath() + "table.txt";
-		
 		DataBaseTableToEntry load = new DataBaseTableToEntry();
-		load.readToBig(path);
+
+		// String path =
+		// DataBaseTableToEntry.class.getClassLoader().getResource("com/liujun/io/user/").getPath()
+		// + "table.txt";
+		// // 设置输出为表信息到javabean转化
+		// LineProcessInf lineProcess = new TableLineToBeanProcess();
+		//
+		// load.readToBig(path, lineProcess);
+
+		String pathCamel = DataBaseTableToEntry.class.getClassLoader().getResource("com/liujun/io/user/").getPath() + "CamelName.txt";
+
+		// 设置输出为表信息到javabean转化
+		LineProcessInf lineCamelProcess = new CamelNameLineProcess();
+
+		load.readToBig(pathCamel, lineCamelProcess);
 		System.out.println();
 	}
 
