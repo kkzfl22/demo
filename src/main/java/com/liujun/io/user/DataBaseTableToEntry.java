@@ -59,9 +59,11 @@ public class DataBaseTableToEntry {
 					name = buffix + end;
 				}
 				
+				System.out.println(name);
+				
 				out += name+";"+LINE ;	
 				
-				System.out.println(out);
+				//System.out.println(out);
 			}
 			
 		} catch (FileNotFoundException e) {
