@@ -3,6 +3,11 @@ package com.liujun.jvm.dataguru.six;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 进行class字节的热加载
@@ -15,63 +20,94 @@ import java.io.IOException;
 * 文件描述：TODO
 * 版权所有：Copyright 2016 zjhz, Inc. All Rights Reserved.
 */
-public class HotLoad extends ClassLoader {
+public class HotLoad {
 
-    private String basePath = "E:\\java\\self\\demo\\target\\classes\\";
+    private String basePath = "D:\\java\\work\\self\\demo\\target\\classes\\";
 
-    @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
-        System.out.println("进行类加载...");
+    private CustomClassLoader customLoad = null;
 
-        name = "com.liujun.jvm.dataguru.six.Worker";
+    @SuppressWarnings("rawtypes")
+    public Class loadClass(String name) throws ClassNotFoundException {
+        customLoad = new CustomClassLoader();
+        return customLoad.findClass(name);
+    }
 
-        // 得到指定路径文件的byte信息
-        String path = className2Path(name);
+    /**
+     * 为检查文件是否有修改,做文件大小的存储
+     */
+    Map<String, Integer> checkMap = new HashMap<>();
 
-        byte[] bytBuff = this.getByte(path);
+    /**
+     * 检查文件是否有修改
+     * @param name 文件路径
+     * @return
+     */
+    public boolean checkUpd(String name) {
 
-        Class clazz = null;
+        if (checkMap.get(name) != null) {
+            int upd = checkMap.get(name);
 
-        clazz = defineClass(name, bytBuff, 0, bytBuff.length);
+            int newSize = this.getFileSize(name);
 
-        return clazz;
+            if (upd == newSize) {
+                return false;
+            }
+            checkMap.put(name, newSize);
+
+            return true;
+        } else {
+            int newSize = this.getFileSize(name);
+            checkMap.put(name, newSize);
+
+            return true;
+        }
+    }
+
+    /**
+     * 得到文件大小
+     * @param name
+     * @return
+     */
+    private int getFileSize(String name) {
+        FileInputStream input = null;
+        try {
+            String path = className2Path(name);
+            input = new FileInputStream(path);
+            return input.available();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            IOUtils.closeQuietly(input);
+        }
+
+        return 0;
     }
 
     private String className2Path(String name) {
         return basePath + name.replace(".", "/") + ".class";
     }
 
-    public byte[] getByte(String path) {
-        byte[] rsp = null;
-
-        FileInputStream input = null;
-        try {
-            input = new FileInputStream(path);
-            rsp = new byte[input.available()];
-            input.read(rsp);
-
-            return rsp;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
+    @Autowired
+    @SuppressWarnings("static-access")
     public static void main(String[] args) {
         HotLoad loader = new HotLoad();
 
-        System.out.println("重新加载");
-        Class<?> clazz;
+        Class<?> clazz = null;
         try {
             // 进行重新加载操作
-            clazz = loader.loadClass("com.liujun.jvm.dataguru.six.Worker");
-            // Object obj = clazz.newInstance();
-            clazz.getMethod("doit").invoke(clazz);
-            // 10秒之后重新加载
-            Thread.currentThread().sleep(5000);
+            while (true) {
+                String name = "com.liujun.jvm.dataguru.six.Worker";
+                // 检查文件是否被修改
+                if (loader.checkUpd(name)) {
+                    System.out.println("发现修改,重新加载...");
+                    clazz = loader.loadClass(name);
+                }
+                clazz.getMethod("doit").invoke(clazz);
+                // 2秒之后重新加载
+                Thread.currentThread().sleep(2000);
+            }
 
         } catch (ClassNotFoundException e) {
             // TODO Auto-generated catch block

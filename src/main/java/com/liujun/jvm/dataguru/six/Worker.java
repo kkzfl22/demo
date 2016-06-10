@@ -14,6 +14,6 @@ package com.liujun.jvm.dataguru.six;
 public class Worker {
 
     public static void doit() {
-        System.out.println("pint doit....3");
+        System.out.println("3adfad this i  33this is pint doit....3");
     }
 }
