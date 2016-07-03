@@ -1,7 +1,9 @@
 package com.liujun.jvm.dataguru.nine;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
- * 使用无锁的方式进行ii操作,在真实的并发环境中不能使用此种，会有数据问题
+ * 使用原子变量进行测试++的情况
 * 源文件名：NotLockAddition.java
 * 文件版本：1.0.0
 * 创建作者：liujun
@@ -11,13 +13,13 @@ package com.liujun.jvm.dataguru.nine;
 * 文件描述：TODO
 * 版权所有：Copyright 2016 zjhz, Inc. All Rights Reserved.
 */
-public class NotLockAddition {
+public class AtomicAddition {
 
     /**
      *
     * @字段说明 value
     */
-    private int value = 0;
+    private AtomicInteger value = new AtomicInteger(0);
 
     /**
      * 使用有锁的方式进行id的加操作
@@ -27,7 +29,7 @@ public class NotLockAddition {
     * @创建日期 2016年6月29日
     */
     public int add() {
-        return value++;
+        return value.incrementAndGet();
     }
 
 }

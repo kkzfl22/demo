@@ -13,11 +13,16 @@ package com.liujun.jvm.dataguru.nine;
 public class TestMain {
 
     public static void main(String[] args) {
-        int maxValue = 10000;
-        int threadNum = 32;
+        int maxValue = 1000000;
+        int threadNum = 1000;
 
-        TestLockAddition.testLock(maxValue, threadNum);
-        TestNotLockAddition.testLock(maxValue, threadNum);
+        TestLockAddition lock = new TestLockAddition();
+        TestNotLockAddition unlock = new TestNotLockAddition();
+        TestAtomicAddition atomic = new TestAtomicAddition();
+
+        lock.testLock(maxValue, threadNum);
+        unlock.testLock(maxValue, threadNum);
+        atomic.testLock(maxValue, threadNum);
 
     }
 }

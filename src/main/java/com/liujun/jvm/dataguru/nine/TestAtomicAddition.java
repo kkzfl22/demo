@@ -4,7 +4,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 /**
- * 测试有锁在多线程下的情况
+ * 测试原子变量在多线程下的情况
 * 源文件名：TestLockAddition.java
 * 文件版本：1.0.0
 * 创建作者：liujun
@@ -14,11 +14,11 @@ import java.util.concurrent.CyclicBarrier;
 * 文件描述：TODO
 * 版权所有：Copyright 2016 zjhz, Inc. All Rights Reserved.
 */
-public class TestLockAddition {
+public class TestAtomicAddition {
 
     public void testLock(final int maxValue, final int maxThread) {
 
-        final LockAddition lock = new LockAddition();
+        final AtomicAddition lock = new AtomicAddition();
 
         long startTime = System.currentTimeMillis();
 
@@ -68,7 +68,7 @@ public class TestLockAddition {
 
         long endTime = System.currentTimeMillis();
 
-        System.out.println("有锁执行时间:" + (endTime - startTime));
+        System.out.println("原子变量执行时间:" + (endTime - startTime));
     }
 
 }

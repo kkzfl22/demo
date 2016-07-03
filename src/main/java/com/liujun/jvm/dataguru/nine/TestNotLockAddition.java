@@ -16,7 +16,7 @@ import java.util.concurrent.CyclicBarrier;
 */
 public class TestNotLockAddition {
 
-    public static void testLock(final int maxValue, final int maxThread) {
+    public void testLock(final int maxValue, final int maxThread) {
 
         final NotLockAddition lock = new NotLockAddition();
 
@@ -26,11 +26,21 @@ public class TestNotLockAddition {
         int waitThread = maxThread + 1;
 
         final CyclicBarrier cyc = new CyclicBarrier(waitThread);
+        final CyclicBarrier cycstart = new CyclicBarrier(waitThread - 1);
 
         for (int i = 0; i < maxThread; i++) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+
+                    try {
+                        cycstart.await();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (BrokenBarrierException e) {
+                        e.printStackTrace();
+                    }
+
                     for (;;) {
                         int value = lock.add();
                         if (value >= maxValue) {
