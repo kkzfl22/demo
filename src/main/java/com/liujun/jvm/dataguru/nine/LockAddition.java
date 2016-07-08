@@ -49,7 +49,17 @@ public class LockAddition {
         } finally {
             lock.unlock();
         }
-
     }
+
+    // /**
+    // * 使用有锁的方式进行id的加操作
+    // * 方法描述
+    // * @param i
+    // * @return
+    // * @创建日期 2016年6月29日
+    // */
+    // public synchronized int add() {
+    // return addInitValue++;
+    // }
 
 }
