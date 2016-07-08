@@ -29,7 +29,7 @@ public class OneWaitQueue {
      * 进行等待的队列实现
     * @字段说明 isRun
     */
-    private List<Object> queueRun = new ArrayList<>(MAX_SIZE);
+    private List<Object> queueRun = new ArrayList<Object>(MAX_SIZE);
 
     /**
      * 当前使用独占锁

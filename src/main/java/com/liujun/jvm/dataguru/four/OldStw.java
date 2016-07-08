@@ -20,7 +20,7 @@ public class OldStw {
      */
     @SuppressWarnings("resource")
     public static void main(String[] args) {
-        Map<Integer, byte[]> map = new HashMap<>();
+        Map<Integer, byte[]> map = new HashMap<Integer, byte[]>();
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("请输入开始进行：");

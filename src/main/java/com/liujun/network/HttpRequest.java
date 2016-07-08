@@ -21,7 +21,7 @@ import java.util.Map;
 */
 public class HttpRequest {
 
-    private static final String TOKEN = "9f8374b698f4c45018424353a56ff67b";
+    private static final String TOKEN = "038eb7a9e2ee3e45c9f093df0f34e29b";
 
     /**
      * 向指定URL发送GET方法的请求

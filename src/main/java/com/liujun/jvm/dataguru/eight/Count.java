@@ -13,7 +13,7 @@ import java.util.Map.Entry;
 
 public class Count {
 
-    private List<Long> timeList = new ArrayList<>();
+    private List<Long> timeList = new ArrayList<Long>();
 
     public static void main(String[] args) {
 
@@ -76,7 +76,7 @@ public class Count {
     }
 
     private Map<String, Integer> getListMap(Map<String, List<Long>> map) {
-        Map<String, Integer> list = new HashMap<>();
+        Map<String, Integer> list = new HashMap<String, Integer>();
 
         for (Entry<String, List<Long>> item : map.entrySet()) {
             list.put(item.getKey(), item.getValue().size());
@@ -86,7 +86,7 @@ public class Count {
     }
 
     private Map<String, List<Long>> ListToMap(List<Long> list) {
-        Map<String, List<Long>> map = new HashMap<>();
+        Map<String, List<Long>> map = new HashMap<String, List<Long>>();
 
         DecimalFormat df = new DecimalFormat("############.###");
 
@@ -105,7 +105,7 @@ public class Count {
             List<Long> value = map.get(key);
 
             if (null == value) {
-                value = new ArrayList<>();
+                value = new ArrayList<Long>();
             }
 
             value.add(timevalue);

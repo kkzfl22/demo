@@ -86,7 +86,7 @@ public class OldFullGcTest {
      */
     class OldFullGc implements Runnable {
 
-        Map<Integer, byte[]> map = new HashMap<>();
+        Map<Integer, byte[]> map = new HashMap<Integer, byte[]>();
 
         @Override
         public void run() {

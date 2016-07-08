@@ -25,7 +25,7 @@ public class ParallelGcUse {
      */
     @SuppressWarnings("static-access")
     public void useMemony() {
-        List<byte[]> list = new ArrayList<>();
+        List<byte[]> list = new ArrayList<byte[]>();
         for (int i = 0; i < MAX_SIZE; i++) {
             // 每次分配1M的空间
             list.add(new byte[1024 * 1024]);

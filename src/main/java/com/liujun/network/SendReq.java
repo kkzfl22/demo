@@ -30,25 +30,28 @@ public class SendReq {
         // System.out.println(list);
 
         // 发送 POST 请求
-        String sr = HttpRequest.sendPost("http://msg.51jxh.com:2223/api?method=OaCookBookService.dtl",
-                "params={\"cookbookId\":\"262361218960855040\"}");
+        String sr = HttpRequest.sendPost("http://msg.51jxh.com:2223/api?method=SchoolRepairService.repairList",
+                "params={}");
         System.out.println(jsonFormatter(sr));
 
-        // 发送 POST 请求
-        String addfalse = HttpRequest.sendPost(
-                "http://msg.51jxh.com:2223/api?method=OaCookBookService.addCookBookPraise",
-                "params={\"cookbookId\":\"262361218960855040\",\"praiseFlag\":\"false\",\"praiseId\":\"265296765165506560\"}");
-        System.out.println(jsonFormatter(addfalse));
-
         // // 发送 POST 请求
-        // String add =
+        // String addfalse = HttpRequest.sendPost(
+        // "http://msg.51jxh.com:2223/api?method=OaCookBookService.addCookBookPraise",
+        // "params={\"cookbookId\":\"262361218960855040\",\"praiseFlag\":\"false\",\"praiseId\":\"265296765165506560\"}");
+        // System.out.println(jsonFormatter(addfalse));
+        //
+        // // // 发送 POST 请求
+        // // String add =
+        // //
         // HttpRequest.sendPost("http://msg.51jxh.com:2223/api?method=OaCookBookService.addCookBookPraise",
+        // //
         // "params={\"cookbookId\":\"262361218960855040\",\"praiseFlag\":\"true\"}");
-        // System.out.println(add);
-
-        String sr2 = HttpRequest.sendPost("http://msg.51jxh.com:2223/api?method=OaCookBookService.dtl",
-                "params={\"cookbookId\":\"262361218960855040\"}");
-        System.out.println(jsonFormatter(sr2));
+        // // System.out.println(add);
+        //
+        // String sr2 =
+        // HttpRequest.sendPost("http://msg.51jxh.com:2223/api?method=OaCookBookService.dtl",
+        // "params={\"cookbookId\":\"262361218960855040\"}");
+        // System.out.println(jsonFormatter(sr2));
     }
 
     /**

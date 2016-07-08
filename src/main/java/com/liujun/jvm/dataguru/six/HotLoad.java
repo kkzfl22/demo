@@ -35,7 +35,7 @@ public class HotLoad {
     /**
      * 为检查文件是否有修改,做文件大小的存储
      */
-    Map<String, Integer> checkMap = new HashMap<>();
+    Map<String, Integer> checkMap = new HashMap<String, Integer>();
 
     /**
      * 检查文件是否有修改
