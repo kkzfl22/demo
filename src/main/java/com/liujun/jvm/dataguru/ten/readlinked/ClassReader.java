@@ -1,10 +1,12 @@
-package com.liujun.jvm.dataguru.ten.read;
+package com.liujun.jvm.dataguru.ten.readlinked;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import com.liujun.jvm.dataguru.ten.read.console.JvmClassIntFlag;
+import com.liujun.jvm.dataguru.ten.readlinked.console.JvmClassStrFlag;
+import com.liujun.jvm.dataguru.ten.readlinked.flow.ReadJavaLanguage;
+import com.liujun.jvm.dataguru.ten.readlinked.flow.ReadVersion;
 import com.liujun.util.IOutils;
 
 /**
@@ -39,44 +41,31 @@ public class ClassReader {
     public void readInterfaceFile(String file) {
         FileInputStream input = null;
 
-        byte[] javaFlag = new byte[4];
         try {
             input = new FileInputStream(file);
-            // 读取开始头，是否为JAVA语言
-            input.read(javaFlag);
 
-            Integer temp = byteToInt2(javaFlag);
+            // 进行class字节码读取流程
+            SeqLinkedList classRead = new SeqLinkedList();
 
-            // 读取到java语言的标识
-            if (temp.equals(JvmClassIntFlag.JAVA_LANGUAGE_FLAG.getFlag())) {
-                System.out.println("当前为java语言");
-            }
+            classRead.putParam(JvmClassStrFlag.COMM_INPUT_STREAM.getFlag(), input);
+
+            // 读取jvm标识
+            classRead.addExec(new ReadJavaLanguage());
+            // 读取JVM版本号
+            classRead.addExec(new ReadVersion());
+
+            classRead.nextExec();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         } finally {
             IOutils.closeStream(input);
         }
     }
 
-    /**
-     * 将byte转换为int值
-    * 方法描述
-    * @param b
-    * @return
-    * @创建日期 2016年7月8日
-    */
-    public static int byteToInt2(byte[] b) {
-        int mask = 0xff;
-        int temp = 0;
-        int n = 0;
-        for (int i = 0; i < 4; i++) {
-            n <<= 8;
-            temp = b[i] & mask;
-            n |= temp;
-        }
-        return n;
-    }
 }

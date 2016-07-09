@@ -1,33 +1,42 @@
 package com.liujun.jvm.dataguru.ten.util;
 
 public class PrintHex {
-    // 备选字符
-    static final char digits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
-    public static void main(String[] args) {
-        parseInt(-54);
+    /**
+     * 将4byte转换为int值
+    * 方法描述
+    * @param b
+    * @return
+    * @创建日期 2016年7月8日
+    */
+    public static int byteToInt4(byte[] b) {
+        int mask = 0xff;
+        int temp = 0;
+        int n = 0;
+        for (int i = 0; i < 4; i++) {
+            n <<= 8;
+            temp = b[i] & mask;
+            n |= temp;
+        }
+        return n;
     }
 
-    public static void parseInt(int inputValue) {
-        int Num = inputValue;// 要转换的数字
-        int length = 32;
-
-        char[] result = new char[length];
-
-        do {
-
-            result[--length] = digits[Num & 15];
-
-            Num >>>= 4;
-
-        } while (Num != 0);
-
-        String value = "0x";
-
-        for (int i = length; i < result.length; i++) {
-            value += result[i];
+    /**
+     * 将2byte转换为int值
+     * 方法描述
+     * @param b
+     * @return
+     * @创建日期 2016年7月8日
+     */
+    public static int byteToInt2(byte[] b) {
+        int mask = 0xff;
+        int temp = 0;
+        int n = 0;
+        for (int i = 0; i < 2; i++) {
+            n <<= 8;
+            temp = b[i] & mask;
+            n |= temp;
         }
-
-        System.out.println(value);
+        return n;
     }
 }
