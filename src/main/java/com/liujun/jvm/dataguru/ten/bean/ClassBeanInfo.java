@@ -7,9 +7,9 @@ public class ClassBeanInfo {
 
     /**
      * 所有的字段
-    * @字段说明 proprotylist
+    * @字段说明 fieldlist
     */
-    private List<String> proprotylist = new ArrayList<String>();
+    private List<String> fieldlist = new ArrayList<String>();
 
     /**
      * 所有方法
@@ -29,12 +29,18 @@ public class ClassBeanInfo {
     */
     private String interClassName;
 
-    public List<String> getProprotylist() {
-        return proprotylist;
+    /**
+     * 类名
+    * @字段说明 className
+    */
+    private String className;
+
+    public List<String> getFieldylist() {
+        return fieldlist;
     }
 
-    public void addProprotylist(String proproty) {
-        this.proprotylist.add(proproty);
+    public void addFieldlist(String proproty) {
+        this.fieldlist.add(proproty);
     }
 
     public List<String> getMethodList() {
@@ -61,17 +67,27 @@ public class ClassBeanInfo {
         this.interClassName = interClassName;
     }
 
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("ClassBeanInfo [proprotylist=");
-        builder.append(proprotylist);
+        builder.append(fieldlist);
         builder.append(", methodList=");
         builder.append(methodList);
         builder.append(", superClassName=");
         builder.append(superClassName);
         builder.append(", interClassName=");
         builder.append(interClassName);
+        builder.append(", className=");
+        builder.append(className);
         builder.append("]");
         return builder.toString();
     }

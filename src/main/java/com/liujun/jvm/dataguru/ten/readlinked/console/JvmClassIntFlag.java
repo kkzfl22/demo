@@ -36,6 +36,22 @@ public enum JvmClassIntFlag {
 
     CONSTANT_NameAndType(12, " 对一个字段或方法的部分符号引用"),
 
+    ACCESSFLAG_ACC_PUBLIC(0x0001, "public"),
+
+    ACCESSFLAG_ACC_FINAL(0x0010, "final,不能被继承."),
+
+    ACCESSFLAG_ACC_SUPER(0x0020, "是否允许使用invokespecial指令，JDK1.2后，该值为true"),
+
+    ACCESSFLAG_ACC_INTERFACE(0x0200, "是否是接口"),
+
+    ACCESSFLAG_ACC_ABSTRACT(0x0400, "抽象类"),
+
+    ACCESSFLAG_ACC_SYNTHETIC(0x1000, "该类不是由用户代码生成,运行时生成的，没有源码"),
+
+    ACCESSFLAG_ACC_ANNOTATION(0x2000, "是否为注解"),
+
+    ACCESSFLAG_ACC_ENUM(0x4000, "是否是枚举")
+
     ;
 
     /**
