@@ -30,9 +30,36 @@ public class SendReq {
         // System.out.println(list);
 
         // 发送 POST 请求
-        String sr = HttpRequest.sendPost("http://msg.51jxh.com:2223/api?method=SchoolRepairService.repairList",
-                "params={}");
-        System.out.println(jsonFormatter(sr));
+        // String sr = HttpRequest.sendPost(
+        // "http://msg.51jxh.com:2223/api?method=OrgAuthService.login&params={%20%22phoneNo%22:%20%2213738687051%22,%20%22pwd%22:%20%22123456%22}",
+        // "");
+        // System.out.println(jsonFormatter(sr));
+        // 发送 POST 请求
+        // String sr2 =
+        // HttpRequest.sendPost("http://msg.51jxh.com:2223/api?method=OAHolidayService.approveList",
+        // "params={}");
+        // System.out.println(jsonFormatter(sr2));
+        //
+        // System.out.println("-----------------------------------------------------------------------");
+        //
+        // String dtlstr =
+        // HttpRequest.sendPost("http://msg.51jxh.com:2223/api?method=OAHolidayService.approveDtlFlow",
+        // "params={'oid':'273133325688770560'}");
+        // System.out.println(jsonFormatter(dtlstr));
+
+        // String dtlstr =
+        // HttpRequest.sendPost("http://msg.51jxh.com:2223/api?method=ConfigFlowService.dtl",
+        // "params={'flowCode':'AL-2016-001'}");
+        // System.out.println(jsonFormatter(dtlstr));
+        String dtlstr = HttpRequest.sendPost(
+                "http://msg.51jxh.com:2223/api?method=SchoolOndutyWeekService.listDutyAllWeekByTime",
+                "params={'homeworkId':'','classIds':'272779020683186176','images':'http://msg.51jxh.com:226/group1/M00/00/12/CmUBaVecBt6AG0BtAAC_wc8Bb3M419.jpg?attname=bb.jpg,','subjectId':'271727907259289600','deliverTime':'2016-08-01','costTime':'22','content':'fdfd'}");
+        System.out.println(jsonFormatter(dtlstr));
+
+        // String sos =
+        // HttpRequest.sendPost("http://msg.liujun.com:223/api?method=OAHolidayService.holidayList",
+        // "params={}");
+        // System.out.println(jsonFormatter(sos));
 
         // // 发送 POST 请求
         // String addfalse = HttpRequest.sendPost(
