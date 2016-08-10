@@ -1,4 +1,4 @@
-package com.liujun.io.nio.sockettofile;
+package com.liujun.io.nio.sockettofile.client;
 
 public class FileServerClientTo {
 
@@ -8,5 +8,4 @@ public class FileServerClientTo {
         new Thread(new FileClientHandleTo(null, port), "TimeClient-002").start();
 
     }
-
 }

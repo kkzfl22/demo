@@ -1,4 +1,4 @@
-package com.liujun.io.nio.sockettofile;
+package com.liujun.io.nio.sockettofile.client;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -10,7 +10,9 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class FileClientHandleTo implements Runnable {
+import com.liujun.io.nio.sockettofile.server.console.Config;
+
+public class FileClientHandleFrom implements Runnable {
 
     /**
      * 服务器的地址
@@ -37,7 +39,7 @@ public class FileClientHandleTo implements Runnable {
      */
     private AtomicBoolean stop = new AtomicBoolean();
 
-    public FileClientHandleTo(String host, int port) {
+    public FileClientHandleFrom(String host, int port) {
         this.host = host == null ? "www.liujun.com" : host;
         this.port = port;
 
@@ -102,11 +104,12 @@ public class FileClientHandleTo implements Runnable {
             if (itemKey.isConnectable()) {
                 // 如果已经完成连接
                 if (sc.finishConnect()) {
-                    sc.register(selector, SelectionKey.OP_READ);
+                    sc.register(selector, SelectionKey.OP_WRITE);
+                    doSend(sc);
                 }
             }
             // 如果当前通道为读取操作
-            if (itemKey.isReadable()) {
+            if (itemKey.isWritable()) {
                 ByteBuffer buf = ByteBuffer.allocate(512);
                 int readBSize = sc.read(buf);
 
@@ -143,10 +146,35 @@ public class FileClientHandleTo implements Runnable {
         if (sc.connect(new InetSocketAddress(host, port))) {
             // 注册读取操作到多路复用器上
             sc.register(selector, SelectionKey.OP_READ);
+
+            // 进行消息的发送
+            this.doSend(sc);
         } else {
             // 注册连接
             sc.register(selector, SelectionKey.OP_CONNECT);
         }
+    }
+
+    private void doSend(SocketChannel sc) throws IOException {
+
+        String value = "这是from数据的信息";
+
+        int length = value.getBytes().length + 8;
+
+        ByteBuffer buff = ByteBuffer.allocate(length);
+
+        buff.putInt(Config.FLAG_TYPE_FROM.getFlag());
+        buff.putInt(value.getBytes().length);
+        buff.put(value.getBytes());
+
+        buff.flip();
+
+        sc.write(buff);
+
+        if (!buff.hasRemaining()) {
+            System.out.println(" client Send order 2 server succeed....");
+        }
+
     }
 
 }

@@ -1,4 +1,4 @@
-package com.liujun.io.nio.sockettofile;
+package com.liujun.io.nio.sockettofile.client;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -10,7 +10,9 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class FileClientHandleFrom implements Runnable {
+import com.liujun.io.nio.sockettofile.server.console.Config;
+
+public class FileClientHandleTo implements Runnable {
 
     /**
      * 服务器的地址
@@ -37,7 +39,7 @@ public class FileClientHandleFrom implements Runnable {
      */
     private AtomicBoolean stop = new AtomicBoolean();
 
-    public FileClientHandleFrom(String host, int port) {
+    public FileClientHandleTo(String host, int port) {
         this.host = host == null ? "www.liujun.com" : host;
         this.port = port;
 
@@ -102,12 +104,12 @@ public class FileClientHandleFrom implements Runnable {
             if (itemKey.isConnectable()) {
                 // 如果已经完成连接
                 if (sc.finishConnect()) {
-                    sc.register(selector, SelectionKey.OP_WRITE);
-                    doSend(sc);
+                    this.doSend(sc);
+                    sc.register(selector, SelectionKey.OP_READ);
                 }
             }
             // 如果当前通道为读取操作
-            if (itemKey.isWritable()) {
+            if (itemKey.isReadable()) {
                 ByteBuffer buf = ByteBuffer.allocate(512);
                 int readBSize = sc.read(buf);
 
@@ -134,6 +136,23 @@ public class FileClientHandleFrom implements Runnable {
         }
     }
 
+    private void doSend(SocketChannel sc) throws IOException {
+
+        ByteBuffer buff = ByteBuffer.allocate(8);
+
+        buff.putInt(Config.FLAG_TYPE_TO.getFlag());
+        buff.putInt(0);
+
+        buff.flip();
+
+        sc.write(buff);
+
+        if (!buff.hasRemaining()) {
+            System.out.println(" client Send order 2 server succeed....");
+        }
+
+    }
+
     /**
      * 进行连接
      * 
@@ -144,30 +163,10 @@ public class FileClientHandleFrom implements Runnable {
         if (sc.connect(new InetSocketAddress(host, port))) {
             // 注册读取操作到多路复用器上
             sc.register(selector, SelectionKey.OP_READ);
-
-            // 进行消息的发送
-            this.doSend(sc);
         } else {
             // 注册连接
             sc.register(selector, SelectionKey.OP_CONNECT);
         }
-    }
-
-    private void doSend(SocketChannel sc) throws IOException {
-        byte[] sendbyt = "QUERY TIME ORDER".getBytes();
-
-        ByteBuffer buff = ByteBuffer.allocate(512);
-
-        buff.put(sendbyt);
-
-        buff.flip();
-
-        sc.write(buff);
-
-        if (!buff.hasRemaining()) {
-            System.out.println(" client Send order 2 server succeed....");
-        }
-
     }
 
 }

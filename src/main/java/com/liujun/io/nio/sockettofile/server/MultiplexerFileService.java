@@ -1,9 +1,7 @@
-package com.liujun.io.nio.sockettofile;
+package com.liujun.io.nio.sockettofile.server;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.channels.FileChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -11,6 +9,10 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.liujun.io.nio.sockettofile.server.service.LinkedChannel;
 
 public class MultiplexerFileService implements Runnable {
 
@@ -29,16 +31,9 @@ public class MultiplexerFileService implements Runnable {
      */
     private AtomicBoolean stop = new AtomicBoolean();
 
-    private FileOutputStream fileRead = null;
-
-    private FileChannel wrchannel = null;
-
     public MultiplexerFileService(int port) {
 
         try {
-            fileRead = new FileOutputStream("d:\\BugReport1.txt", true);
-            wrchannel = fileRead.getChannel();
-
             // 1,打开ServerSocketChannel，用于监听客户端的连接，它是所有客户端连接的父管道
             serverchannel = ServerSocketChannel.open();
             // 2,绑定监听端口，设置连接为非阻塞模式
@@ -93,8 +88,7 @@ public class MultiplexerFileService implements Runnable {
         }
     }
 
-    private boolean isread = false;
-
+    @Autowired(required = false)
     private void handleInput(SelectionKey key) throws IOException {
 
         if (null != key && key.isValid()) {
@@ -117,23 +111,13 @@ public class MultiplexerFileService implements Runnable {
                 // 得到当前
                 SocketChannel sc = (SocketChannel) key.channel();
 
-                if (!isread) {
-                    long num = wrchannel.transferFrom(sc, 0, 512);
-
-                    if (num > 0) {
-                        // 将当前通道变为写入通道
-                        isread = true;
-                        sc.register(selector, SelectionKey.OP_WRITE);
-                    }
-                }
-
+                // 将通道中的对象交给其他线程处理
+                LinkedChannel.getInstance().pull(sc);
+                // 在处理完毕后将通道事件改变
+                // 回复当前通道消息已经接收
+                sc.register(selector, SelectionKey.OP_WRITE);
             }
-            if (key.isWritable()) {
-                // 得到当前
-                SocketChannel sc = (SocketChannel) key.channel();
 
-                wrchannel.transferTo(0, 512, sc);
-            }
         }
     }
 
