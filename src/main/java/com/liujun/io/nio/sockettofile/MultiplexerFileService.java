@@ -1,8 +1,9 @@
-package com.liujun.io.nio;
+package com.liujun.io.nio.sockettofile;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -11,7 +12,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class MultiplexerTimeService implements Runnable {
+public class MultiplexerFileService implements Runnable {
 
     /**
      * 多路选择器
@@ -28,8 +29,16 @@ public class MultiplexerTimeService implements Runnable {
      */
     private AtomicBoolean stop = new AtomicBoolean();
 
-    public MultiplexerTimeService(int port) {
+    private FileOutputStream fileRead = null;
+
+    private FileChannel wrchannel = null;
+
+    public MultiplexerFileService(int port) {
+
         try {
+            fileRead = new FileOutputStream("d:\\BugReport1.txt", true);
+            wrchannel = fileRead.getChannel();
+
             // 1,打开ServerSocketChannel，用于监听客户端的连接，它是所有客户端连接的父管道
             serverchannel = ServerSocketChannel.open();
             // 2,绑定监听端口，设置连接为非阻塞模式
@@ -56,7 +65,7 @@ public class MultiplexerTimeService implements Runnable {
         while (!stop.get()) {
             try {
                 // 在此通道阻塞1000毫秒
-                selector.select(1000);
+                selector.select(2000);
                 // 轮循进行检查是否有已经准备就绪的key
                 Set<SelectionKey> selectkey = selector.selectedKeys();
                 Iterator<SelectionKey> iter = selectkey.iterator();
@@ -68,6 +77,7 @@ public class MultiplexerTimeService implements Runnable {
                     try {
                         this.handleInput(sekey);
                     } catch (Exception e) {
+                        e.printStackTrace();
                         if (null != sekey) {
                             sekey.cancel();
                             if (sekey.channel() != null) {
@@ -83,7 +93,10 @@ public class MultiplexerTimeService implements Runnable {
         }
     }
 
+    private boolean isread = false;
+
     private void handleInput(SelectionKey key) throws IOException {
+
         if (null != key && key.isValid()) {
             // 如果当前的连接已经用于套接字接受操作
             if (key.isAcceptable()) {
@@ -104,46 +117,23 @@ public class MultiplexerTimeService implements Runnable {
                 // 得到当前
                 SocketChannel sc = (SocketChannel) key.channel();
 
-                // 准备缓冲区
-                ByteBuffer buff = ByteBuffer.allocate(512);
+                if (!isread) {
+                    long num = wrchannel.transferFrom(sc, 0, 512);
 
-                int readSize = sc.read(buff);
-
-                if (readSize > 0) {
-                    buff.flip();
-
-                    byte[] bytestr = new byte[buff.remaining()];
-                    buff.get(bytestr);
-
-                    String body = new String(bytestr, "UTF-8");
-
-                    System.out.println("The time server receive order :" + body);
-
-                    String currentTime = "QUERY TIME ORDER".equalsIgnoreCase(body)
-                            ? new java.util.Date(System.currentTimeMillis()).toString() : "BAD ORDER";
-
-                    this.doWrite(sc, currentTime);
-                } else if (readSize < 0) {
-                    key.cancel();
-                    sc.close();
-                } else {
-                    ;// 读取到零字节，忽略
+                    if (num > 0) {
+                        // 将当前通道变为写入通道
+                        isread = true;
+                        sc.register(selector, SelectionKey.OP_WRITE);
+                    }
                 }
+
             }
-        }
-    }
+            if (key.isWritable()) {
+                // 得到当前
+                SocketChannel sc = (SocketChannel) key.channel();
 
-    private void doWrite(SocketChannel chann, String rsp) throws IOException {
-        if (rsp != null && rsp.length() > 0) {
-            byte[] bytes = rsp.getBytes();
-
-            ByteBuffer buff = ByteBuffer.allocate(bytes.length);
-
-            buff.put(bytes);
-
-            buff.flip();
-
-            chann.write(buff);
+                wrchannel.transferTo(0, 512, sc);
+            }
         }
     }
 

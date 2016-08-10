@@ -1,0 +1,106 @@
+CREATE TABLE LTE_GET_SNO(
+  frame             BigInt,
+  last_frame        BigInt,
+  ttime             TIMESTAMP,
+  record_file_index BigInt,
+  apn               STRING,
+  ci                BigInt,
+  imsi              STRING,
+  mobile_type       STRING,
+  success           BigInt,
+  answer_time       BigInt,
+  radio_answer_time BigInt,
+  response_time     BigInt,
+  content_length    BigInt,
+  uri_main          STRING,
+  failure_cause     STRING,
+  dest_ip           BigInt,
+  dest_port         BigInt,
+  last_fileindex    BigInt,
+  retransfer_count  INT,
+  packets           BigInt,
+  referer           STRING,
+  status_code       STRING,
+  web_volume        BigInt,
+  user_agent        STRING,
+  content_type      STRING,
+  ul_teid           BigInt,
+  dl_teid           BigInt,
+  s_gw_ip           BigInt,
+  enb_ip            BigInt,
+  rat_type          INT,
+  user_ip_value     BigInt,
+  uri               STRING,
+  os                STRING,
+  clientsoft        INT,
+  clientsoft2       INT,
+  latitude          Decimal(17,8),
+  longitude         Decimal(17,8),
+  title             STRING,
+  keywords          STRING,
+  content_index     INT,
+  total_category    BigInt,
+  sub_category1     BigInt,
+  sub_category2     BigInt,
+  sub_category3     BigInt,
+  sub_category4     BigInt,
+  category          STRING,
+  enb               STRING,
+  s_gw              STRING,
+  search_words      STRING,
+  lasttime          TIMESTAMP,
+  dlpacket_time     TIMESTAMP,
+  ip_home           STRING,
+  user_ip_b         BigInt,
+  bitrate           BigInt,
+  zone_id           BigInt,
+  tcp_gap_8s        BigInt,
+  status_cat        STRING,
+  im_username       BigInt,
+  get_times         INT,
+  rsp_loc           BigInt,
+  tac               BigInt,
+  imei              STRING,
+  mobile_brand      STRING,
+  msisdn            STRING,
+  vipnumber         STRING,
+  loaderfill        STRING,
+  TTIME_HMS     INT
+)
+PARTITIONED BY (PARTITION_TTIME_DATE INT,PARTITION_TTIME_HOUR INT,PARTITION_IMSI INT)
+clustered by(ci,mobile_type) 
+into 6 buckets;
+
+
+alter table LTE_GET_SNO add partition (PARTITION_TTIME_DATE=20160508,PARTITION_TTIME_HOUR=7,PARTITION_IMSI=1);
+alter table LTE_GET_SNO add partition (PARTITION_TTIME_DATE=20160508,PARTITION_TTIME_HOUR=8,PARTITION_IMSI=1);
+alter table LTE_GET_SNO add partition (PARTITION_TTIME_DATE=20160508,PARTITION_TTIME_HOUR=9,PARTITION_IMSI=1);
+alter table LTE_GET_SNO add partition (PARTITION_TTIME_DATE=20160508,PARTITION_TTIME_HOUR=10,PARTITION_IMSI=1);
+
+
+
+INSERT INTO TABLE LTE_GET_SNO PARTITION (PARTITION_TTIME_DATE=20160508,PARTITION_TTIME_HOUR=8,PARTITION_IMSI)  
+SELECT 
+frame,last_frame,ttime,record_file_index,apn,ci,
+case when imsi = ''
+ then '880612'
+ else imsi
+end imsi
+,mobile_type,success,
+answer_time,radio_answer_time,response_time,content_length,uri_main,failure_cause,
+dest_ip,dest_port,last_fileindex,retransfer_count,packets,referer,status_code,
+web_volume,user_agent,content_type,ul_teid,dl_teid,s_gw_ip,enb_ip,rat_type,
+user_ip_value,uri,os,clientsoft,clientsoft2,latitude,longitude,title,keywords,
+content_index,total_category,sub_category1,sub_category2,sub_category3,sub_category4,
+category,enb,s_gw,search_words,lasttime,dlpacket_time,ip_home,user_ip_b,bitrate,
+zone_id,tcp_gap_8s,status_cat,im_username,get_times,rsp_loc,
+tac,imei,mobile_brand,msisdn,vipnumber,loaderfill,
+cast(from_unixtime(cast(t.TTIME as int),'HHmmss') as int) as TTIME_HMS,
+ cast((case when imsi = ''
+ then '880612'
+ else imsi
+end) as BIGINT)%50 PARTITION_IMSI
+ FROM  LTE_GET_160508 t where t.TTIME >= TIMESTAMP' 2016-05-08 08:00:00' and
+                       t.TTIME < TIMESTAMP' 2016-05-08 09:00:00' ; 
+
+
