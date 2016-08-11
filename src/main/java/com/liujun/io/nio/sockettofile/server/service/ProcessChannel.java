@@ -23,7 +23,7 @@ public class ProcessChannel implements Runnable {
     */
     private CyclicBarrier control = new CyclicBarrier(1);
 
-    private List<ProcessMsg> listMsg = new ArrayList<>();
+    private List<ProcessMsg> listMsg = new ArrayList<ProcessMsg>();
 
     @Override
     public void run() {

@@ -10,6 +10,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.liujun.io.nio.trans.tran.TransProxy;
+
 public class MultiplexerFirstService implements Runnable {
 
     /**
@@ -67,6 +69,7 @@ public class MultiplexerFirstService implements Runnable {
                     try {
                         this.handleInput(sekey);
                     } catch (Exception e) {
+                        e.printStackTrace();
                         if (null != sekey) {
                             sekey.cancel();
                             if (sekey.channel() != null) {
@@ -103,6 +106,9 @@ public class MultiplexerFirstService implements Runnable {
                 // 得到当前
                 SocketChannel sc = (SocketChannel) key.channel();
 
+                TransProxy.getInstance().tranFile(sc);
+
+                sc.register(selector, SelectionKey.OP_WRITE);
             }
         }
     }

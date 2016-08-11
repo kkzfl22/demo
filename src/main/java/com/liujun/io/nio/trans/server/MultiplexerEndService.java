@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.liujun.io.nio.sockettofile.server.service.LinkedChannel;
+import com.liujun.io.nio.trans.tran.TransProxy;
 
 /**
  * 后端数据读取操作
@@ -40,16 +40,8 @@ public class MultiplexerEndService implements Runnable {
      */
     private AtomicBoolean stop = new AtomicBoolean();
 
-    /**
-     * 通道对象信息
-    * @字段说明 channel
-    */
-    private LinkedChannel channel;
-
-    public MultiplexerEndService(int port, LinkedChannel channel) {
+    public MultiplexerEndService(int port) {
         try {
-            // 指定消息传递的通道
-            this.channel = channel;
 
             // 1,打开ServerSocketChannel，用于监听客户端的连接，它是所有客户端连接的父管道
             serverchannel = ServerSocketChannel.open();
@@ -125,11 +117,9 @@ public class MultiplexerEndService implements Runnable {
                 // 得到当前
                 SocketChannel sc = (SocketChannel) key.channel();
 
-                SocketChannel chann = null;
+                // 检查是否已经生成数据
+                TransProxy.getInstance().writeChannel(sc);
 
-                while ((chann = channel.getChannel()) != null) {
-
-                }
             }
         }
     }

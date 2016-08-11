@@ -29,7 +29,7 @@ public class LinkedChannel {
      * 待处理的对象
     * @字段说明 linked
     */
-    private LinkedList<SocketChannel> channelList = new LinkedList<>();
+    private LinkedList<SocketChannel> channelList = new LinkedList<SocketChannel>();
 
     /**
      * 独占锁对象

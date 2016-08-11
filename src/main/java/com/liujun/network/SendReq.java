@@ -24,7 +24,7 @@ public class SendReq {
     */
     public void login() {
         // 发送 POST 请求
-        String list = HttpRequest.sendPost("http://msg.51jxh.com:2223/api?method=OrgAuthService.login",
+        String list = HttpRequest.sendPost("http://msg.51jxh.com/api?method=OrgAuthService.login",
                 "params={'userName':'14511111123','pwd':'123456','os':'web'}");
         System.out.println(jsonFormatter(list));
     }
@@ -75,10 +75,10 @@ public class SendReq {
 
         SendReq send = new SendReq();
 
-        // send.login();
+        send.login();
         // send.approve();
         // send.oAHoliday();
-        send.repair();
+        // send.repair();
 
         // 发送 GET 请求
         // String s =
