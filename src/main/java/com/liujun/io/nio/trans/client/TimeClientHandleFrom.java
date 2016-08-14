@@ -35,7 +35,7 @@ public class TimeClientHandleFrom implements Runnable {
     /**
      * 当前的是否停止,默认false，开始状态
      */
-    private AtomicBoolean stop = new AtomicBoolean();
+    private AtomicBoolean stop = new AtomicBoolean(false);
 
     public TimeClientHandleFrom(String host, int port) {
         this.host = host == null ? "www.liujun.com" : host;
@@ -59,6 +59,9 @@ public class TimeClientHandleFrom implements Runnable {
             this.doConnection();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
         // 进行消息的接收
@@ -73,6 +76,7 @@ public class TimeClientHandleFrom implements Runnable {
 
                 while (iterKey.hasNext()) {
                     SelectionKey itemKey = iterKey.next();
+
                     iterKey.remove();
 
                     try {
@@ -93,7 +97,7 @@ public class TimeClientHandleFrom implements Runnable {
         }
     }
 
-    public void receive(SelectionKey itemKey) throws IOException {
+    public void receive(SelectionKey itemKey) throws IOException, InterruptedException {
         // 如果当前键是有效的
         if (itemKey.isValid()) {
             // 得到服务器端的通道
@@ -122,8 +126,6 @@ public class TimeClientHandleFrom implements Runnable {
                     String body = new String(bytebuff, "UTF-8");
 
                     System.out.println("new Recive rsp:" + body);
-
-                    this.stop.set(true);
                 } else if (readBSize < 0) {
                     itemKey.cancel();
                     sc.close();
@@ -139,8 +141,9 @@ public class TimeClientHandleFrom implements Runnable {
      * 进行连接
      * 
      * @throws IOException
+     * @throws InterruptedException 
      */
-    private void doConnection() throws IOException {
+    private void doConnection() throws IOException, InterruptedException {
         // 如果服用服务器的连接已经连接成功，需要将读取消息注册到多路复用器上，然后发送消息
         if (sc.connect(new InetSocketAddress(host, port))) {
             // 注册读取操作到多路复用器上
@@ -154,20 +157,31 @@ public class TimeClientHandleFrom implements Runnable {
         }
     }
 
-    private void doSend(SocketChannel sc) throws IOException {
+    int index = 0;
 
-        String value = "这是来源数据的信息";
+    private void doSend(SocketChannel sc) throws IOException, InterruptedException {
 
-        int length = value.getBytes().length + 8;
+        while (index < 1000) {
+            String value = "这是来源数据的信息" + index;
 
-        ByteBuffer buff = ByteBuffer.allocate(length);
+            int length = value.getBytes().length + 8;
 
-        buff.putInt(value.getBytes().length);
-        buff.put(value.getBytes());
+            ByteBuffer buff = ByteBuffer.allocate(length);
 
-        buff.flip();
+            buff.putInt(value.getBytes().length);
+            buff.put(value.getBytes());
 
-        sc.write(buff);
+            buff.flip();
+
+            sc.write(buff);
+
+            // 每隔1秒发送一次
+            Thread.currentThread().sleep(1000);
+
+            System.out.println("当前第:" + index + "发送");
+
+            index++;
+        }
     }
 
 }

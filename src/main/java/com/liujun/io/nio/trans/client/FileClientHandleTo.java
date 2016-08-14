@@ -10,8 +10,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.liujun.io.nio.sockettofile.server.console.Config;
-
 public class FileClientHandleTo implements Runnable {
 
     /**
@@ -104,51 +102,49 @@ public class FileClientHandleTo implements Runnable {
             if (itemKey.isConnectable()) {
                 // 如果已经完成连接
                 if (sc.finishConnect()) {
-                    this.doSend(sc);
                     sc.register(selector, SelectionKey.OP_READ);
                 }
             }
+
             // 如果当前通道为读取操作
             if (itemKey.isReadable()) {
-                ByteBuffer buf = ByteBuffer.allocate(512);
-                int readBSize = sc.read(buf);
-
-                if (readBSize > 0) {
-                    buf.flip();
-
-                    byte[] bytebuff = new byte[buf.remaining()];
-
-                    buf.get(bytebuff);
-
-                    String body = new String(bytebuff, "UTF-8");
-
-                    System.out.println("new Recive rsp:" + body);
-
-                    this.stop.set(true);
-                } else if (readBSize < 0) {
-                    itemKey.cancel();
-                    sc.close();
-                } else {
-                    ;
-                }
+                this.read(sc);
+                sc.register(selector, SelectionKey.OP_READ);
 
             }
         }
+
     }
 
-    private void doSend(SocketChannel sc) throws IOException {
+    int index = 0;
 
-        ByteBuffer buff = ByteBuffer.allocate(8);
+    /**
+     * 进行消息的读取操作
+    * 方法描述
+    * @param sc
+     * @throws IOException 
+     * @创建日期 2016年8月14日
+    */
+    private void read(SocketChannel sc) throws IOException {
 
-        buff.putInt(Config.FLAG_TYPE_TO.getFlag());
-        buff.putInt(0);
+        ByteBuffer buf = ByteBuffer.allocate(512);
+        int readBSize = sc.read(buf);
 
-        buff.flip();
+        if (readBSize > 0) {
+            buf.flip();
 
-        sc.write(buff);
+            byte[] bytebuff = new byte[buf.remaining()];
 
-        if (!buff.hasRemaining()) {
-            System.out.println(" client Send order 2 server succeed....");
+            buf.get(bytebuff);
+
+            String body = new String(bytebuff, "UTF-8");
+
+            System.out.println("第" + index + "接收，消息内容为:" + body);
+            index++;
+        } else if (readBSize < 0) {
+            sc.close();
+        } else {
+            ;
         }
 
     }
