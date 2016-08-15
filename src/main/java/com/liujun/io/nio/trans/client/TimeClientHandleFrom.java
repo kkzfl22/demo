@@ -164,11 +164,10 @@ public class TimeClientHandleFrom implements Runnable {
         while (index < 1000) {
             String value = "这是来源数据的信息" + index;
 
-            int length = value.getBytes().length + 8;
+            int length = value.getBytes().length;
 
             ByteBuffer buff = ByteBuffer.allocate(length);
 
-            buff.putInt(value.getBytes().length);
             buff.put(value.getBytes());
 
             buff.flip();
@@ -176,7 +175,7 @@ public class TimeClientHandleFrom implements Runnable {
             sc.write(buff);
 
             // 每隔1秒发送一次
-            Thread.currentThread().sleep(1000);
+            // Thread.currentThread().sleep(100);
 
             System.out.println("当前第:" + index + "发送");
 

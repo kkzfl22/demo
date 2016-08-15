@@ -3,8 +3,8 @@ package com.liujun.io.nio.trans.tran;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -52,18 +52,19 @@ public class TransProxyFile implements TransProxyInf {
     private AtomicLong fileSize = new AtomicLong(0);
 
     /**
+     * 文件写入的position
+    * @字段说明 writePost
+    */
+    private AtomicLong writePostion = new AtomicLong(0);
+
+    /**
      * 通道信息
     * @字段说明 channel
     */
     private FileChannel channel = null;
 
     private TransProxyFile() {
-        try {
-            randomFile = new RandomAccessFile(url, "rw");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        channel = randomFile.getChannel();
+        this.openFile();
     }
 
     public static TransProxyFile getInstance() {
@@ -77,15 +78,16 @@ public class TransProxyFile implements TransProxyInf {
     * @创建日期 2016年8月11日
     */
     public void tranFrom(SocketChannel socketChanel) throws IOException {
+        if (!channel.isOpen()) {
+            this.openFile();
+        }
 
-        // 读取长通道中的数据大小
-        ByteBuffer buffer = ByteBuffer.allocate(4);
-        socketChanel.read(buffer);
-        buffer.flip();
-        int size = buffer.getInt();
+        long tranFrom = 0;
 
-        // 转换为文件
-        channel.transferFrom(socketChanel, 0, size);
+        // 读取源通道
+        if ((tranFrom = channel.transferFrom(socketChanel, fileSize.get(), 512)) > 0) {
+            fileSize.set(fileSize.get() + tranFrom);
+        }
     }
 
     /**
@@ -96,12 +98,43 @@ public class TransProxyFile implements TransProxyInf {
     */
     public void tranTo(SocketChannel toChannel) throws IOException {
 
-        // 转换为文件
-        channel.transferTo(0, channel.size(), toChannel);
+        long writeSize = 0;
+        // 进行目标通道的写入
+        while ((writeSize = channel.transferTo(writePostion.get(), fileSize.get(), toChannel)) > 0) {
+            // 设置文件的大小信息
+            writePostion.set(writePostion.get() + writeSize);
+        }
 
-        // 进行文件清空
-        channel.truncate(0);
+        // 如果有数据写入，才进行判断置空操作
+        if (writePostion.get() > 0) {
 
+            // 写入完成后清空文件通道信息
+            FileLock lock = channel.tryLock();
+
+            try {
+                // 进行文件清空
+                channel.truncate(0);
+                // 文件大小也被清空
+                fileSize.set(0);
+            } finally {
+                lock.release();
+            }
+        }
+
+    }
+
+    /**
+     * 进行文件流通道的打开操作
+    * 方法描述
+    * @创建日期 2016年8月15日
+    */
+    public void openFile() {
+        try {
+            randomFile = new RandomAccessFile(url, "rw");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        channel = randomFile.getChannel();
     }
 
     /**
@@ -110,6 +143,27 @@ public class TransProxyFile implements TransProxyInf {
     * @创建日期 2016年8月13日
     */
     public void close() {
+
+        // 写入完成后清空文件通道信息
+        FileLock lock = null;
+        try {
+            lock = channel.tryLock();
+
+            // 进行文件清空
+            channel.truncate(0);
+            // 文件大小也被清空
+            fileSize.set(0);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                lock.release();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         IOutils.closeStream(channel);
         IOutils.closeStream(randomFile);
     }

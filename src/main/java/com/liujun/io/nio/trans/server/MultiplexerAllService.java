@@ -115,6 +115,8 @@ public class MultiplexerAllService implements Runnable {
                         TransProxyFile.getInstance().tranFrom(sc);
                     } catch (IOException e) {
                         e.printStackTrace();
+                        // 发生异常关闭流信息
+                        TransProxyFile.getInstance().close();
                         throw e;
                     }
                 }
@@ -125,6 +127,8 @@ public class MultiplexerAllService implements Runnable {
                         TransProxyFile.getInstance().tranTo(sc);
                     } catch (IOException e) {
                         e.printStackTrace();
+                        // 发生异常关闭流信息
+                        TransProxyFile.getInstance().close();
                         throw e;
                     }
                 }

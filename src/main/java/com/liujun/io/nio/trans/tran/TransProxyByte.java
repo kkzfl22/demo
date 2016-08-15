@@ -24,7 +24,7 @@ public class TransProxyByte implements TransProxyInf {
      * 消息信息
     * @字段说明 msg
     */
-    private ArrayList<byte[]> msg = new ArrayList<>();
+    private ArrayList<byte[]> msg = new ArrayList<byte[]>();
 
     private TransProxyByte() {
     }
