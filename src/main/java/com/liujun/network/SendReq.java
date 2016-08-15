@@ -24,8 +24,8 @@ public class SendReq {
     */
     public void login() {
         // 发送 POST 请求
-        String list = HttpRequest.sendPost("http://msg.51jxh.com/api?method=OrgAuthService.login",
-                "params={'userName':'14511111123','pwd':'123456','os':'web'}");
+        String list = HttpRequest.sendPost("http://edu.51jxh.com:2222/api?method=OrgAuthService.login",
+                "params={'userName':'何建芬','pwd':'123456','os':'web'}");
         System.out.println(jsonFormatter(list));
     }
 
@@ -35,10 +35,22 @@ public class SendReq {
     * @创建日期 2016年7月25日
     */
     public void oAHoliday() {
-        // // 发送 POST 请求
-        String list = HttpRequest.sendPost("http://msg.51jxh.com:2223/api?method=OAHolidayService.approveList",
-                "params={'startTime':'2016-07-27 11:02:24','endTime':'2016-07-27 11:06:51'}");
+        // // 查询请假的老师
+        // String list = HttpRequest.sendPost(
+        // "http://edu.51jxh.com:2222/api?method=OAHolidayService.listTeacherByNotSchdule",
+        // "params={'startTime':'2016-07-27 11:02:24','endTime':'2016-07-27
+        // 11:06:51'}");
+        // System.out.println(jsonFormatter(list));
+        // 查询请假的老师
+        String list = HttpRequest.sendPost("http://edu.51jxh.com:2222/api?method=OaHolidayLinkService.addList",
+                "params={'oaLinkedParam':[{'clazz': '1', 'lteacherId': '1', 'oid': '123', 'oteacherId': '1', 'schoolId': '1', 'subjectId': '1', 'userId': '312', 'week': '1'}, {'clazz': '3', 'lteacherId': '3', 'oid': '123', 'oteacherId': '3', 'schoolId': '3', 'subjectId': '3', 'userId': '312', 'week': '3'}]}");
         System.out.println(jsonFormatter(list));
+        // // // 发送 POST 请求
+        // String list =
+        // HttpRequest.sendPost("http://msg.51jxh.com:2223/api?method=OAHolidayService.approveList",
+        // "params={'startTime':'2016-07-27 11:02:24','endTime':'2016-07-27
+        // 11:06:51'}");
+        // System.out.println(jsonFormatter(list));
         // // 进行详情查询
         // String list =
         // HttpRequest.sendPost("http://msg.51jxh.com:2223/api?method=OAHolidayService.holidayDtl",
@@ -75,9 +87,9 @@ public class SendReq {
 
         SendReq send = new SendReq();
 
-        send.login();
+        // send.login();
         // send.approve();
-        // send.oAHoliday();
+        send.oAHoliday();
         // send.repair();
 
         // 发送 GET 请求

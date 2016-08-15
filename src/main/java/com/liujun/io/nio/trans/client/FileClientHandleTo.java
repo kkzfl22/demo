@@ -109,8 +109,6 @@ public class FileClientHandleTo implements Runnable {
             // 如果当前通道为读取操作
             if (itemKey.isReadable()) {
                 this.read(sc);
-                sc.register(selector, SelectionKey.OP_READ);
-
             }
         }
 
