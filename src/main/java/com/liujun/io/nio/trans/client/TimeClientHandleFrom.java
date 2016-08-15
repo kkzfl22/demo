@@ -107,7 +107,7 @@ public class TimeClientHandleFrom implements Runnable {
                 // 如果已经完成连接
                 if (sc.finishConnect()) {
                     sc.register(selector, SelectionKey.OP_READ);
-                    doSend(sc);
+                    // doSend(sc);
 
                 }
             }
@@ -125,7 +125,7 @@ public class TimeClientHandleFrom implements Runnable {
 
                     String body = new String(bytebuff, "UTF-8");
 
-                    System.out.println("new Recive rsp:" + body);
+                    System.out.println("收到:" + body);
                 } else if (readBSize < 0) {
                     itemKey.cancel();
                     sc.close();

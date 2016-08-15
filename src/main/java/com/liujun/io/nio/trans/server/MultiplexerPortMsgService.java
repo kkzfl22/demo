@@ -26,13 +26,15 @@ public class MultiplexerPortMsgService {
     * @param selector
     * @创建日期 2016年8月14日
     */
-    public void portInit(int port, Selector selector, int type) {
+    public void portInit(String hostin, int port, Selector selector, int type) {
+
+        String host = hostin == null ? "www.liujun.com" : hostin;
         try {
 
             // 1,打开ServerSocketChannel，用于监听客户端的连接，它是所有客户端连接的父管道
             ServerSocketChannel serverchannel = ServerSocketChannel.open();
             // 2,绑定监听端口，设置连接为非阻塞模式
-            serverchannel.socket().bind(new InetSocketAddress("www.liujun.com", port));
+            serverchannel.socket().bind(new InetSocketAddress(host, port));
             serverchannel.configureBlocking(false);
             // 3,创建多路复用器
             // selector = Selector.open();

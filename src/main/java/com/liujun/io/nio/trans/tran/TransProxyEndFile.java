@@ -6,7 +6,6 @@ import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.SocketChannel;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.liujun.io.nio.sockettofile.tran.FromTo;
@@ -22,22 +21,16 @@ import com.liujun.util.IOutils;
 * 文件描述：TODO
 * 版权所有：Copyright 2016 zjhz, Inc. All Rights Reserved.
 */
-public class TransProxyFile implements TransProxyInf {
+public class TransProxyEndFile implements TransProxyInf {
 
-    private static final TransProxyFile tranProxy = new TransProxyFile();
-
-    /**
-     * 转换的信息
-    * @字段说明 isTran
-    */
-    private AtomicBoolean isTran = new AtomicBoolean(false);
+    private static final TransProxyEndFile tranProxy = new TransProxyEndFile();
 
     /**
      * 生成文件的路径信息
     * @字段说明 url
     */
     private String url = FromTo.class.getClassLoader().getResource("com/liujun/io/nio/trans/tran").getPath()
-            + "/proces.data";
+            + "/procesEnd.data";
 
     /**
      * 随机文件读取流程
@@ -63,11 +56,11 @@ public class TransProxyFile implements TransProxyInf {
     */
     private FileChannel channel = null;
 
-    private TransProxyFile() {
+    private TransProxyEndFile() {
         this.openFile();
     }
 
-    public static TransProxyFile getInstance() {
+    public static TransProxyEndFile getInstance() {
         return tranProxy;
     }
 
@@ -86,12 +79,12 @@ public class TransProxyFile implements TransProxyInf {
 
         // 读取源通道
         if ((tranFrom = channel.transferFrom(socketChanel, fileSize.get(), 512)) > 0) {
-            System.out.println("读取到数据长度:" + tranFrom);
+            System.out.println("EndFIle读取到数据长度:" + tranFrom);
             fileSize.set(fileSize.get() + tranFrom);
         }
 
         if (tranFrom > 0) {
-            System.out.println("收到数据:" + tranFrom);
+            System.out.println("EndFIle收到数据:" + tranFrom);
         }
     }
 
