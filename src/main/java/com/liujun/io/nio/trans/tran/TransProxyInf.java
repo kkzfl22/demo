@@ -23,7 +23,7 @@ public interface TransProxyInf {
     * @throws IOException
     * @创建日期 2016年8月14日
     */
-    public void tranFrom(SocketChannel socketChanel) throws IOException;
+    public boolean tranFrom(SocketChannel socketChanel) throws IOException;
 
     /**
      * 针对目录文件转换
@@ -32,6 +32,6 @@ public interface TransProxyInf {
     * @throws IOException
     * @创建日期 2016年8月14日
     */
-    public void tranTo(SocketChannel socketChanel) throws IOException;
+    public boolean tranTo(SocketChannel socketChanel) throws IOException;
 
 }

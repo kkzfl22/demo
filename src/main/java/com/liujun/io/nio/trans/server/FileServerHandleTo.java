@@ -55,7 +55,7 @@ public class FileServerHandleTo {
         // 如果服用服务器的连接已经连接成功，需要将读取消息注册到多路复用器上，然后发送消息
         if (sc.connect(new InetSocketAddress(host, port))) {
             // 注册读取操作到多路复用器上
-            sc.register(selector, SelectionKey.OP_READ);
+            sc.register(selector, SelectionKey.OP_READ, type);
         } else {
             // 注册连接
             sc.register(selector, SelectionKey.OP_CONNECT, type);

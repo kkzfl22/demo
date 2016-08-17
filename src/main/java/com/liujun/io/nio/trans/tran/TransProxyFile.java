@@ -6,13 +6,13 @@ import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.SocketChannel;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.liujun.io.nio.sockettofile.tran.FromTo;
 import com.liujun.util.IOutils;
 
 /**
+ * 前端的数据向后端传输通道
 * 源文件名：TransProxy.java
 * 文件版本：1.0.0
 * 创建作者：liujun
@@ -25,12 +25,6 @@ import com.liujun.util.IOutils;
 public class TransProxyFile implements TransProxyInf {
 
     private static final TransProxyFile tranProxy = new TransProxyFile();
-
-    /**
-     * 转换的信息
-    * @字段说明 isTran
-    */
-    private AtomicBoolean isTran = new AtomicBoolean(false);
 
     /**
      * 生成文件的路径信息
@@ -77,7 +71,7 @@ public class TransProxyFile implements TransProxyInf {
     * @param socketChanel
     * @创建日期 2016年8月11日
     */
-    public void tranFrom(SocketChannel socketChanel) throws IOException {
+    public boolean tranFrom(SocketChannel socketChanel) throws IOException {
         if (!channel.isOpen()) {
             this.openFile();
         }
@@ -86,13 +80,16 @@ public class TransProxyFile implements TransProxyInf {
 
         // 读取源通道
         if ((tranFrom = channel.transferFrom(socketChanel, fileSize.get(), 512)) > 0) {
-            System.out.println("读取到数据长度:" + tranFrom);
             fileSize.set(fileSize.get() + tranFrom);
         }
 
         if (tranFrom > 0) {
-            System.out.println("收到数据:" + tranFrom);
+            System.out.println("前端向后端通道中发送数据A1:" + tranFrom);
+            // 标识数据已经转换到通道中
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -101,12 +98,12 @@ public class TransProxyFile implements TransProxyInf {
     * @param toChannel
     * @创建日期 2016年8月11日
     */
-    public void tranTo(SocketChannel toChannel) throws IOException {
+    public boolean tranTo(SocketChannel toChannel) throws IOException {
 
         long writeSize = 0;
         // 进行目标通道的写入
         while ((writeSize = channel.transferTo(writePostion.get(), fileSize.get(), toChannel)) > 0) {
-            System.out.println("进行目标写入:" + writePostion.get());
+            System.out.println("后端通道向后端发送A2:" + writePostion.get());
             // 设置文件的大小信息
             writePostion.set(writePostion.get() + writeSize);
         }
@@ -125,7 +122,11 @@ public class TransProxyFile implements TransProxyInf {
             } finally {
                 lock.release();
             }
+
+            return true;
         }
+
+        return false;
 
     }
 

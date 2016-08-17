@@ -12,6 +12,7 @@ import com.liujun.io.nio.sockettofile.tran.FromTo;
 import com.liujun.util.IOutils;
 
 /**
+ * 后端向前端的数据进行写入
 * 源文件名：TransProxy.java
 * 文件版本：1.0.0
 * 创建作者：liujun
@@ -70,7 +71,7 @@ public class TransProxyEndFile implements TransProxyInf {
     * @param socketChanel
     * @创建日期 2016年8月11日
     */
-    public void tranFrom(SocketChannel socketChanel) throws IOException {
+    public boolean tranFrom(SocketChannel socketChanel) throws IOException {
         if (!channel.isOpen()) {
             this.openFile();
         }
@@ -79,13 +80,16 @@ public class TransProxyEndFile implements TransProxyInf {
 
         // 读取源通道
         if ((tranFrom = channel.transferFrom(socketChanel, fileSize.get(), 512)) > 0) {
-            System.out.println("EndFIle读取到数据长度:" + tranFrom);
             fileSize.set(fileSize.get() + tranFrom);
         }
 
         if (tranFrom > 0) {
-            System.out.println("EndFIle收到数据:" + tranFrom);
+            System.out.println("后端通道收到后端的数据B1:" + tranFrom);
+
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -94,12 +98,12 @@ public class TransProxyEndFile implements TransProxyInf {
     * @param toChannel
     * @创建日期 2016年8月11日
     */
-    public void tranTo(SocketChannel toChannel) throws IOException {
+    public boolean tranTo(SocketChannel toChannel) throws IOException {
 
         long writeSize = 0;
         // 进行目标通道的写入
         while ((writeSize = channel.transferTo(writePostion.get(), fileSize.get(), toChannel)) > 0) {
-            System.out.println("进行目标写入:" + writePostion.get());
+            System.out.println("后端通道向前端通道中写入B2:" + writeSize);
             // 设置文件的大小信息
             writePostion.set(writePostion.get() + writeSize);
         }
@@ -118,7 +122,10 @@ public class TransProxyEndFile implements TransProxyInf {
             } finally {
                 lock.release();
             }
+            return true;
         }
+
+        return false;
 
     }
 

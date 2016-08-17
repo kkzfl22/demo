@@ -14,7 +14,17 @@ public enum Config {
      * 后端端口标识 
     * @字段说明 CONFIG_TYPE_END
     */
-    CONFIG_TYPE_END(2);
+    CONFIG_TYPE_END(2),
+
+    /**
+     * 前端端口数据读取完毕标识 
+    * 方法描述
+     * @return 
+    * @创建日期 2016年8月14日
+    */
+    CONFIG_TYPE_FIRST_OVER(2),
+
+    ;
 
     private Config(int key) {
         this.key = key;

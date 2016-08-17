@@ -107,8 +107,7 @@ public class TimeClientHandleFrom implements Runnable {
                 // 如果已经完成连接
                 if (sc.finishConnect()) {
                     sc.register(selector, SelectionKey.OP_READ);
-                    // doSend(sc);
-
+                    doSend(sc);
                 }
             }
             // 如果当前通道为读取操作
@@ -161,7 +160,7 @@ public class TimeClientHandleFrom implements Runnable {
 
     private void doSend(SocketChannel sc) throws IOException, InterruptedException {
 
-        while (index < 1000) {
+        while (index < 10) {
             String value = "这是来源数据的信息" + index;
 
             int length = value.getBytes().length;
@@ -174,8 +173,8 @@ public class TimeClientHandleFrom implements Runnable {
 
             sc.write(buff);
 
-            // 每隔1秒发送一次
-            // Thread.currentThread().sleep(100);
+            // 每隔3秒发送一次
+            Thread.currentThread().sleep(1000);
 
             System.out.println("当前第:" + index + "发送");
 
