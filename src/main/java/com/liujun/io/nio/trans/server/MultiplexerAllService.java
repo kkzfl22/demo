@@ -57,17 +57,20 @@ public class MultiplexerAllService implements Runnable {
             try {
                 // 在此通道阻塞1000毫秒
                 int readyChannels = selector.select(100);
+
+                System.out.println("键集操作数目:" + readyChannels);
                 if (readyChannels == 0) {
                     continue;
                 }
 
                 // 轮循进行检查是否有已经准备就绪的key
                 Set<SelectionKey> selectkey = selector.selectedKeys();
+
                 Iterator<SelectionKey> iter = selectkey.iterator();
 
                 while (iter.hasNext()) {
                     SelectionKey sekey = iter.next();
-
+                    iter.remove();
                     // 将当前的数据交给对应的方法来处理
                     try {
                         this.handleInput(sekey);
@@ -81,7 +84,6 @@ public class MultiplexerAllService implements Runnable {
                         }
                     }
 
-                    iter.remove();
                 }
 
             } catch (IOException e) {
@@ -91,7 +93,27 @@ public class MultiplexerAllService implements Runnable {
     }
 
     private void handleInput(SelectionKey key) throws IOException {
-        if (null != key && key.isValid()) {
+
+        if (key.isValid()) {
+
+            // 如果当前的连接已经用于套接字接受操作
+            if (key.isAcceptable()) {
+                // 得到当前注册的通道
+                ServerSocketChannel ssc = (ServerSocketChannel) key.channel();
+
+                Integer type = (Integer) key.attachment();
+
+                SocketChannel sc = ssc.accept();
+
+                // 设置为非阻塞
+                sc.configureBlocking(false);
+
+                if (Config.CONFIG_TYPE_FIRST.getKey() == type) {
+                    // 前端的数据进行读取，
+                    sc.register(selector, SelectionKey.OP_WRITE, type);
+                }
+
+            }
 
             // 如果当前的键为连接
             if (key.isConnectable()) {
@@ -100,41 +122,10 @@ public class MultiplexerAllService implements Runnable {
                 // 如果已经完成连接
                 if (sc.finishConnect()) {
                     Integer type = (Integer) key.attachment();
-                    sc.register(selector, SelectionKey.OP_CONNECT, type);
-                }
-            }
-            // 如果完成连接操作
-            if (key.isConnectable()) {
-                // 得到当前
-                SocketChannel sc = (SocketChannel) key.channel();
-
-                Integer type = (Integer) key.attachment();
-
-                if (Config.CONFIG_TYPE_END.getKey() == type) {
-                    // 如果为后端,需要向通道中写入数据
                     sc.register(selector, SelectionKey.OP_WRITE, type);
                 }
             }
-            // 如果当前的连接已经用于套接字接受操作
-            if (key.isAcceptable()) {
-                // 得到当前注册的通道
-                ServerSocketChannel ssc = (ServerSocketChannel) key.channel();
 
-                // 得到socket通信通道
-                SocketChannel sc = ssc.accept();
-                if (null != sc) {
-                    // 设置为非阻塞
-                    sc.configureBlocking(false);
-                }
-
-                Integer type = (Integer) key.attachment();
-
-                if (Config.CONFIG_TYPE_FIRST.getKey() == type) {
-                    // 前端的数据进行读取，
-                    sc.register(selector, SelectionKey.OP_WRITE, type);
-                }
-
-            }
             // 检查此键的通道是否已准备好进行读取
             if (key.isReadable() || key.isWritable()) {
                 // 得到当前
@@ -190,8 +181,8 @@ public class MultiplexerAllService implements Runnable {
                     }
 
                 }
-
             }
+
         }
     }
 

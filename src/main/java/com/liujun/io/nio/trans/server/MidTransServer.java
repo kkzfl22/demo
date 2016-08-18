@@ -45,7 +45,7 @@ public class MidTransServer {
         // 启动连接另外的端口信息
         FileServerHandleTo handler = new FileServerHandleTo();
 
-        handler.setToConnInfo("172.16.18.109", 3306, selector, Config.CONFIG_TYPE_END.getKey());
+        handler.setToConnInfo("192.168.3.10", 3306, selector, Config.CONFIG_TYPE_END.getKey());
         // handler.setToConnInfo("www.liujun.com", 3001, selector,
         // Config.CONFIG_TYPE_END.getKey());
 
