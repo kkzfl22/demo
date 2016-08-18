@@ -39,7 +39,9 @@ public class TransProxyByte implements TransProxyInf {
     * @param socketChanel
     * @创建日期 2016年8月11日
     */
-    public void tranFrom(SocketChannel socketChanel) throws IOException {
+    public boolean tranFrom(SocketChannel socketChanel) throws IOException {
+
+        boolean tranFrom = false;
 
         ByteBuffer buff = ByteBuffer.allocate(512);
 
@@ -47,7 +49,10 @@ public class TransProxyByte implements TransProxyInf {
             buff.flip();
             msg.add(buff.array());
             buff.clear();
+            tranFrom = true;
         }
+
+        return tranFrom;
 
     }
 
@@ -57,7 +62,10 @@ public class TransProxyByte implements TransProxyInf {
     * @param toChannel
     * @创建日期 2016年8月11日
     */
-    public void tranTo(SocketChannel toChannel) throws IOException {
+    public boolean tranTo(SocketChannel toChannel) throws IOException {
+
+        boolean tranTo = false;
+
         if (!msg.isEmpty()) {
             Iterator<byte[]> iter = msg.iterator();
 
@@ -72,9 +80,12 @@ public class TransProxyByte implements TransProxyInf {
                 toChannel.write(buff);
                 buff.clear();
                 iter.remove();
-            }
 
+                tranTo = false;
+            }
         }
+
+        return tranTo;
     }
 
 }

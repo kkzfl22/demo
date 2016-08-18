@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.liujun.io.nio.trans.console.Config;
+import com.liujun.io.nio.trans.tran.TransProxyEndFile;
 import com.liujun.io.nio.trans.tran.TransProxyFile;
 
 /**
@@ -68,6 +69,7 @@ public class MultiplexerAllService implements Runnable {
                     try {
                         this.handleInput(sekey);
                     } catch (Exception e) {
+                        e.printStackTrace();
                         if (null != sekey) {
                             sekey.cancel();
                             if (sekey.channel() != null) {
@@ -83,8 +85,44 @@ public class MultiplexerAllService implements Runnable {
         }
     }
 
+    /**
+     * 前端写入标识
+    * @字段说明 firstWristFlag
+    */
+    private AtomicBoolean firstWristFlag = new AtomicBoolean(false);
+
+    /**
+     * 前端写入标识
+     * @字段说明 firstWristFlag
+     */
+    private AtomicBoolean endWristFlag = new AtomicBoolean(false);
+
     private void handleInput(SelectionKey key) throws IOException {
         if (null != key && key.isValid()) {
+
+            // 如果当前的键为连接
+            if (key.isConnectable()) {
+                // 得到当前
+                SocketChannel sc = (SocketChannel) key.channel();
+                // 如果已经完成连接
+                if (sc.finishConnect()) {
+                    Integer type = (Integer) key.attachment();
+                    sc.register(selector, SelectionKey.OP_CONNECT, type);
+                }
+            }
+            // 如果完成连接操作
+            if (key.isConnectable()) {
+                // 得到当前
+                SocketChannel sc = (SocketChannel) key.channel();
+
+                Integer type = (Integer) key.attachment();
+
+                if (Config.CONFIG_TYPE_END.getKey() == type) {
+                    // 如果为后端,需要向通道中写入数据
+                    sc.register(selector, SelectionKey.OP_WRITE, type);
+                }
+            }
+
             // 如果当前的连接已经用于套接字接受操作
             if (key.isAcceptable()) {
                 // 得到当前注册的通道
@@ -98,11 +136,14 @@ public class MultiplexerAllService implements Runnable {
 
                 Integer type = (Integer) key.attachment();
 
-                // 在socket通道中注册一个读取通道
-                sc.register(selector, SelectionKey.OP_WRITE, type);
+                if (Config.CONFIG_TYPE_FIRST.getKey() == type) {
+                    // 前端的数据进行读取，
+                    sc.register(selector, SelectionKey.OP_READ, type);
+                }
+
             }
             // 检查此键的通道是否已准备好进行读取
-            if (key.isReadable() || key.isWritable()) {
+            if (key.isReadable()) {
                 // 得到当前
                 SocketChannel sc = (SocketChannel) key.channel();
 
@@ -110,7 +151,7 @@ public class MultiplexerAllService implements Runnable {
 
                 // 如果为前端
                 if (Config.CONFIG_TYPE_FIRST.getKey() == type) {
-                    // // 检查是否已经生成数据
+                    // 首先读取前端的数据生成到文件
                     try {
                         TransProxyFile.getInstance().tranFrom(sc);
                     } catch (IOException e) {
@@ -119,22 +160,70 @@ public class MultiplexerAllService implements Runnable {
                         TransProxyFile.getInstance().close();
                         throw e;
                     }
+
+                    sc.register(selector, SelectionKey.OP_WRITE, type);
+
                 }
                 // 如果为后端
-                else if (Config.CONFIG_TYPE_END.getKey() == type) {
-                    // // 检查是否已经生成数据
+                if (Config.CONFIG_TYPE_END.getKey() == type) {
+                    // 从后端捞取到数据，并写入通道中
                     try {
-                        TransProxyFile.getInstance().tranTo(sc);
+                        TransProxyEndFile.getInstance().tranFrom(sc);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        // 发生异常关闭流信息
+                        TransProxyEndFile.getInstance().close();
+                        throw e;
+                    }
+
+                    firstWristFlag.set(true);
+                }
+
+            }
+            // 数据的写入准备
+            if (key.isWritable()) {
+                // 得到当前
+                SocketChannel sc = (SocketChannel) key.channel();
+
+                Integer type = (Integer) key.attachment();
+
+                // 如果为前端
+                if (Config.CONFIG_TYPE_FIRST.getKey() == type) {
+                    // 将数据中后端通道中写入前端
+                    boolean writeRsp = false;
+                    try {
+                        writeRsp = TransProxyEndFile.getInstance().tranTo(sc);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        // 发生异常关闭流信息
+                        TransProxyEndFile.getInstance().close();
+                        throw e;
+                    }
+
+                    if (writeRsp) {
+                        sc.register(selector, SelectionKey.OP_READ, type);
+                    }
+
+                }
+                // 如果为后端
+                if (Config.CONFIG_TYPE_END.getKey() == type) {
+                    // 进行前端已经到中间状态的数据向后端传输
+                    boolean transRsp = false;
+                    try {
+                        transRsp = TransProxyFile.getInstance().tranTo(sc);
                     } catch (IOException e) {
                         e.printStackTrace();
                         // 发生异常关闭流信息
                         TransProxyFile.getInstance().close();
                         throw e;
                     }
+
+                    if (transRsp) {
+                        sc.register(selector, SelectionKey.OP_READ, type);
+                    }
                 }
 
             }
-
         }
     }
 

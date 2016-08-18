@@ -12,7 +12,7 @@ import com.liujun.io.nio.sockettofile.tran.FromTo;
 import com.liujun.util.IOutils;
 
 /**
- * 前端的数据向后端传输通道
+ * 后端向前端的数据进行写入
 * 源文件名：TransProxy.java
 * 文件版本：1.0.0
 * 创建作者：liujun
@@ -22,16 +22,16 @@ import com.liujun.util.IOutils;
 * 文件描述：TODO
 * 版权所有：Copyright 2016 zjhz, Inc. All Rights Reserved.
 */
-public class TransProxyFile implements TransProxyInf {
+public class TransProxyEndFile implements TransProxyInf {
 
-    private static final TransProxyFile tranProxy = new TransProxyFile();
+    private static final TransProxyEndFile tranProxy = new TransProxyEndFile();
 
     /**
      * 生成文件的路径信息
     * @字段说明 url
     */
     private String url = FromTo.class.getClassLoader().getResource("com/liujun/io/nio/trans/tran").getPath()
-            + "/proces.data";
+            + "/procesEnd.data";
 
     /**
      * 随机文件读取流程
@@ -57,11 +57,11 @@ public class TransProxyFile implements TransProxyInf {
     */
     private FileChannel channel = null;
 
-    private TransProxyFile() {
+    private TransProxyEndFile() {
         this.openFile();
     }
 
-    public static TransProxyFile getInstance() {
+    public static TransProxyEndFile getInstance() {
         return tranProxy;
     }
 
@@ -84,8 +84,8 @@ public class TransProxyFile implements TransProxyInf {
         }
 
         if (tranFrom > 0) {
-            System.out.println("前端向后端通道中发送数据A1:" + tranFrom);
-            // 标识数据已经转换到通道中
+            System.out.println("后端通道收到后端的数据B1:" + tranFrom);
+
             return true;
         }
 
@@ -103,7 +103,7 @@ public class TransProxyFile implements TransProxyInf {
         long writeSize = 0;
         // 进行目标通道的写入
         while ((writeSize = channel.transferTo(writePostion.get(), fileSize.get(), toChannel)) > 0) {
-            System.out.println("后端通道向后端发送A2:" + writePostion.get());
+            System.out.println("后端通道向前端通道中写入B2:" + writeSize);
             // 设置文件的大小信息
             writePostion.set(writePostion.get() + writeSize);
         }
@@ -122,7 +122,6 @@ public class TransProxyFile implements TransProxyInf {
             } finally {
                 lock.release();
             }
-
             return true;
         }
 
