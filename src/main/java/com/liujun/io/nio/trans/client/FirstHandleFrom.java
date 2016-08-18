@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class TimeClientHandleFrom implements Runnable {
+public class FirstHandleFrom implements Runnable {
 
     /**
      * 服务器的地址
@@ -37,7 +37,7 @@ public class TimeClientHandleFrom implements Runnable {
      */
     private AtomicBoolean stop = new AtomicBoolean(false);
 
-    public TimeClientHandleFrom(String host, int port) {
+    public FirstHandleFrom(String host, int port) {
         this.host = host == null ? "www.liujun.com" : host;
         this.port = port;
 
@@ -100,18 +100,26 @@ public class TimeClientHandleFrom implements Runnable {
     public void receive(SelectionKey itemKey) throws IOException, InterruptedException {
         // 如果当前键是有效的
         if (itemKey.isValid()) {
-            // 得到服务器端的通道
-            SocketChannel sc = (SocketChannel) itemKey.channel();
+
             // 如果当前的键为连接
             if (itemKey.isConnectable()) {
+                // 得到服务器端的通道
+                SocketChannel sc = (SocketChannel) itemKey.channel();
                 // 如果已经完成连接
                 if (sc.finishConnect()) {
-                    sc.register(selector, SelectionKey.OP_READ);
-                    doSend(sc);
+                    sc.register(selector, SelectionKey.OP_CONNECT);
                 }
             }
+            // 如果完成连接操作
+            if (itemKey.isConnectable()) {
+                // 得到当前
+                SocketChannel sc = (SocketChannel) itemKey.channel();
+                // 如果为后端,需要向通道中写入数据
+                sc.register(selector, SelectionKey.OP_WRITE);
+            }
+
             // 如果当前通道为读取操作
-            if (itemKey.isReadable()) {
+            if (itemKey.isReadable() || itemKey.isWritable()) {
                 ByteBuffer buf = ByteBuffer.allocate(512);
                 int readBSize = sc.read(buf);
 
@@ -124,15 +132,13 @@ public class TimeClientHandleFrom implements Runnable {
 
                     String body = new String(bytebuff, "UTF-8");
 
-                    System.out.println("收到:" + body);
-                } else if (readBSize < 0) {
-                    itemKey.cancel();
-                    sc.close();
-                } else {
-                    ;
+                    System.out.println("A客户端收到回复:" + body);
                 }
 
+                // 进行数据发送
+                doSend(sc);
             }
+
         }
     }
 
@@ -147,9 +153,6 @@ public class TimeClientHandleFrom implements Runnable {
         if (sc.connect(new InetSocketAddress(host, port))) {
             // 注册读取操作到多路复用器上
             sc.register(selector, SelectionKey.OP_READ);
-
-            // 进行消息的发送
-            this.doSend(sc);
         } else {
             // 注册连接
             sc.register(selector, SelectionKey.OP_CONNECT);
@@ -160,7 +163,7 @@ public class TimeClientHandleFrom implements Runnable {
 
     private void doSend(SocketChannel sc) throws IOException, InterruptedException {
 
-        while (index < 10) {
+        if (index < 100) {
             String value = "这是来源数据的信息" + index;
 
             int length = value.getBytes().length;
@@ -173,10 +176,9 @@ public class TimeClientHandleFrom implements Runnable {
 
             sc.write(buff);
 
+            System.out.println("当前第:" + index + "发送");
             // 每隔3秒发送一次
             Thread.currentThread().sleep(1000);
-
-            System.out.println("当前第:" + index + "发送");
 
             index++;
         }

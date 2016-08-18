@@ -84,8 +84,7 @@ public class TransProxyEndFile implements TransProxyInf {
         }
 
         if (tranFrom > 0) {
-            System.out.println("后端通道收到后端的数据B1:" + tranFrom);
-
+            System.out.println("读取B完成,大小:" + fileSize.get());
             return true;
         }
 
@@ -103,7 +102,8 @@ public class TransProxyEndFile implements TransProxyInf {
         long writeSize = 0;
         // 进行目标通道的写入
         while ((writeSize = channel.transferTo(writePostion.get(), fileSize.get(), toChannel)) > 0) {
-            System.out.println("后端通道向前端通道中写入B2:" + writeSize);
+            System.out.println(
+                    "写入A完成,postion:" + writePostion.get() + ",通道大小:" + channel.size() + ",fileSize:" + fileSize.get());
             // 设置文件的大小信息
             writePostion.set(writePostion.get() + writeSize);
         }
@@ -119,6 +119,8 @@ public class TransProxyEndFile implements TransProxyInf {
                 channel.truncate(0);
                 // 文件大小也被清空
                 fileSize.set(0);
+                // 设置写入的游标为0
+                writePostion.set(0);
             } finally {
                 lock.release();
             }
@@ -137,10 +139,13 @@ public class TransProxyEndFile implements TransProxyInf {
     public void openFile() {
         try {
             randomFile = new RandomAccessFile(url, "rw");
+            channel = randomFile.getChannel();
+            channel.truncate(0);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        channel = randomFile.getChannel();
     }
 
     /**

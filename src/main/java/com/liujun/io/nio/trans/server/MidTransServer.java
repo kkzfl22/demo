@@ -5,9 +5,26 @@ import java.nio.channels.Selector;
 
 import com.liujun.io.nio.trans.console.Config;
 
-public class TimeServer {
+/**
+ * 中间转换服务
+* 源文件名：MidTransServer.java
+* 文件版本：1.0.0
+* 创建作者：liujun
+* 创建日期：2016年8月18日
+* 修改作者：liujun
+* 修改日期：2016年8月18日
+* 文件描述：TODO
+* 版权所有：Copyright 2016 zjhz, Inc. All Rights Reserved.
+*/
+public class MidTransServer {
 
-    public static void main(String[] args) throws IOException {
+    /**
+     * 进行中间转换服务的
+    * 方法描述
+    * @throws IOException
+    * @创建日期 2016年8月18日
+    */
+    public void run() throws IOException {
 
         // 多通道使用一个多路选择器
         Selector selector = Selector.open();
@@ -16,7 +33,7 @@ public class TimeServer {
         // 前端端口
         int firstPort = 9001;
 
-        String host = "192.168.3.2";
+        String host = "www.liujun.com";
 
         MultiplexerPortMsgService port1Init = new MultiplexerPortMsgService();
         // 进行端口1前端的初始化操作
@@ -28,11 +45,22 @@ public class TimeServer {
         // 启动连接另外的端口信息
         FileServerHandleTo handler = new FileServerHandleTo();
 
-        handler.setToConnInfo("192.168.3.2", 3001, selector, Config.CONFIG_TYPE_END.getKey());
+        handler.setToConnInfo("172.16.18.109", 3306, selector, Config.CONFIG_TYPE_END.getKey());
+        // handler.setToConnInfo("www.liujun.com", 3001, selector,
+        // Config.CONFIG_TYPE_END.getKey());
 
         // 进行多路选择器的遍历
         MultiplexerAllService allService = new MultiplexerAllService(selector);
         new Thread(allService, "TimeServer port-001").start();
+
+        // 进行多路选择器的遍历
+
     }
 
+    public static void main(String[] args) throws IOException {
+
+        MidTransServer trans = new MidTransServer();
+        trans.run();
+
+    }
 }
