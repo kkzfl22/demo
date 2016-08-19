@@ -6,6 +6,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 
+import com.liujun.io.nio.trans.bean.ChannelAttachMsg;
+
 /**
  * 后端数据读取操作
 * 源文件名：MultiplexerEndService.java
@@ -26,7 +28,7 @@ public class MultiplexerPortMsgService {
     * @param selector
     * @创建日期 2016年8月14日
     */
-    public void portInit(String hostin, int port, Selector selector, int type) {
+    public void portInit(String hostin, int port, Selector selector, ChannelAttachMsg msg) {
 
         String host = hostin == null ? "www.liujun.com" : hostin;
         try {
@@ -39,7 +41,7 @@ public class MultiplexerPortMsgService {
             // 3,创建多路复用器
             // selector = Selector.open();
             // 4,注册ACCEPT事件到通道中，监听ACCEPT事情
-            serverchannel.register(selector, SelectionKey.OP_ACCEPT, type);
+            serverchannel.register(selector, SelectionKey.OP_ACCEPT, msg);
             System.out.println("the time server start in port :" + port);
         } catch (IOException e) {
             e.printStackTrace();

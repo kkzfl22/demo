@@ -88,4 +88,26 @@ public class TransProxyByte implements TransProxyInf {
         return tranTo;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.liujun.io.nio.trans.tran.TransProxyInf#close()
+     */
+    @Override
+    public void close() {
+        // TODO Auto-generated method stub
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.liujun.io.nio.trans.tran.TransProxyInf#reset()
+     */
+    @Override
+    public void reset() {
+        // TODO Auto-generated method stub
+
+    }
+
 }

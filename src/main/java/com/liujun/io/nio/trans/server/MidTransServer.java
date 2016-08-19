@@ -3,6 +3,8 @@ package com.liujun.io.nio.trans.server;
 import java.io.IOException;
 import java.nio.channels.Selector;
 
+import com.liujun.io.nio.trans.bean.ChannelAttachMsg;
+import com.liujun.io.nio.trans.conn.TransConnectManager;
 import com.liujun.io.nio.trans.console.Config;
 
 /**
@@ -28,16 +30,18 @@ public class MidTransServer {
 
         // 多通道使用一个多路选择器
         Selector selector = Selector.open();
-
         // 初始化端口信息
         // 前端端口
         int firstPort = 9001;
 
         String host = "www.liujun.com";
 
+        // 生成通道的信息,针对前端的信息
+        ChannelAttachMsg attach = new ChannelAttachMsg(Config.CONFIG_TYPE_FIRST.getKey());
+
         MultiplexerPortMsgService port1Init = new MultiplexerPortMsgService();
         // 进行端口1前端的初始化操作
-        port1Init.portInit(host, firstPort, selector, Config.CONFIG_TYPE_FIRST.getKey());
+        port1Init.portInit(host, firstPort, selector, attach);
         // 进行端口2后端的初始化操作
         // port1Init.portInit(endPost, selector,
         // Config.CONFIG_TYPE_END.getKey());
@@ -45,12 +49,13 @@ public class MidTransServer {
         // 启动连接另外的端口信息
         FileServerHandleTo handler = new FileServerHandleTo();
 
-        handler.setToConnInfo("192.168.3.10", 3306, selector, Config.CONFIG_TYPE_END.getKey());
-        // handler.setToConnInfo("www.liujun.com", 3001, selector,
-        // Config.CONFIG_TYPE_END.getKey());
+        handler.setToConnInfo("172.16.18.109", 3306, selector, attach);
+        // handler.setToConnInfo("www.liujun.com", 3001, selector, attachEnd);
+
+        TransConnectManager tan = null;
 
         // 进行多路选择器的遍历
-        MultiplexerAllService allService = new MultiplexerAllService(selector);
+        MultiplexerAllService allService = new MultiplexerAllService(selector, tan);
         new Thread(allService, "TimeServer port-001").start();
 
         // 进行多路选择器的遍历

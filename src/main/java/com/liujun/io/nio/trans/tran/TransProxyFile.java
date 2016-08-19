@@ -24,14 +24,11 @@ import com.liujun.util.IOutils;
 */
 public class TransProxyFile implements TransProxyInf {
 
-    private static final TransProxyFile tranProxy = new TransProxyFile();
-
     /**
      * 生成文件的路径信息
     * @字段说明 url
     */
-    private String url = FromTo.class.getClassLoader().getResource("com/liujun/io/nio/trans/tran").getPath()
-            + "/proces.data";
+    private String url = FromTo.class.getClassLoader().getResource("com/liujun/io/nio/trans/tran").getPath();
 
     /**
      * 随机文件读取流程
@@ -52,17 +49,25 @@ public class TransProxyFile implements TransProxyInf {
     private AtomicLong writePostion = new AtomicLong(0);
 
     /**
+     * 转换的数字
+    * @字段说明 numLong
+    */
+    private AtomicLong numLong = new AtomicLong(0);
+
+    /**
      * 通道信息
     * @字段说明 channel
     */
     private FileChannel channel = null;
 
-    private TransProxyFile() {
-        this.openFile();
-    }
+    /**
+     * 文件时间
+    * @字段说明 fileTime
+    */
+    private long fileTime;
 
-    public static TransProxyFile getInstance() {
-        return tranProxy;
+    public TransProxyFile() {
+        this.openFile();
     }
 
     /**
@@ -81,6 +86,7 @@ public class TransProxyFile implements TransProxyInf {
         // 读取源通道
         if ((tranFrom = channel.transferFrom(socketChanel, fileSize.get(), 512)) > 0) {
             fileSize.set(fileSize.get() + tranFrom);
+            numLong.incrementAndGet();
         }
 
         if (tranFrom > 0) {
@@ -101,6 +107,27 @@ public class TransProxyFile implements TransProxyInf {
     public boolean tranTo(SocketChannel toChannel) throws IOException {
 
         long writeSize = 0;
+
+        if (numLong.get() == 1) {
+            System.out.println("进行文件清空");
+            // 写入完成后清空文件通道信息
+            FileLock lock = channel.tryLock();
+
+            try {
+                // 进行文件清空
+                channel.truncate(0);
+                // 文件大小也被清空
+                fileSize.set(0);
+                // 设置写入的游标为0
+                writePostion.set(0);
+            } finally {
+                lock.release();
+            }
+            numLong.incrementAndGet();
+
+            return false;
+        }
+
         // 进行目标通道的写入
         while ((writeSize = channel.transferTo(writePostion.get(), fileSize.get(), toChannel)) > 0) {
             System.out.println(
@@ -139,13 +166,40 @@ public class TransProxyFile implements TransProxyInf {
     */
     public void openFile() {
         try {
-            randomFile = new RandomAccessFile(url, "rw");
+            // 系统时间纳秒数，以保证文件不重复
+            fileTime = System.nanoTime();
+            randomFile = new RandomAccessFile(url + fileTime, "rw");
             channel = randomFile.getChannel();
             channel.truncate(0);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * 重置连接信息
+    * 方法描述
+    * @创建日期 2016年8月19日
+    */
+    public void reset() {
+        // 写入完成后清空文件通道信息
+        FileLock lock = null;
+        try {
+            lock = channel.tryLock();
+            // 进行文件清空
+            channel.truncate(0);
+            // 文件大小也被清空
+            fileSize.set(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                lock.release();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

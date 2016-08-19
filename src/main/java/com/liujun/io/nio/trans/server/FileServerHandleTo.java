@@ -6,6 +6,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
+import com.liujun.io.nio.trans.bean.ChannelAttachMsg;
+
 public class FileServerHandleTo {
 
     /**
@@ -28,7 +30,7 @@ public class FileServerHandleTo {
      */
     private SocketChannel sc;
 
-    public void setToConnInfo(String host, int port, Selector selectorIn, int type) {
+    public void setToConnInfo(String host, int port, Selector selectorIn, ChannelAttachMsg msg) {
         this.host = host == null ? "www.liujun.com" : host;
         this.port = port;
 
@@ -40,7 +42,7 @@ public class FileServerHandleTo {
             sc.configureBlocking(false);
 
             // 注册连接信息
-            this.doConnection(type);
+            this.doConnection(msg);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -51,14 +53,14 @@ public class FileServerHandleTo {
      * 
      * @throws IOException
      */
-    private void doConnection(int type) throws IOException {
+    private void doConnection(ChannelAttachMsg msg) throws IOException {
         // 如果服用服务器的连接已经连接成功，需要将读取消息注册到多路复用器上，然后发送消息
         if (sc.connect(new InetSocketAddress(host, port))) {
             // 注册读取操作到多路复用器上
-            sc.register(selector, SelectionKey.OP_READ, type);
+            sc.register(selector, SelectionKey.OP_READ, msg);
         } else {
             // 注册连接
-            sc.register(selector, SelectionKey.OP_CONNECT, type);
+            sc.register(selector, SelectionKey.OP_CONNECT, msg);
         }
     }
 

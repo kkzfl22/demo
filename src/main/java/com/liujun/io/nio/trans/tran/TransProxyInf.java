@@ -34,4 +34,18 @@ public interface TransProxyInf {
     */
     public boolean tranTo(SocketChannel socketChanel) throws IOException;
 
+    /**
+     * 关闭接口
+    * 方法描述
+    * @创建日期 2016年8月19日
+    */
+    public void close();
+
+    /**
+     * 重置连接信息
+    * 方法描述
+    * @创建日期 2016年8月19日
+    */
+    public void reset();
+
 }

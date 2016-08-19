@@ -9,8 +9,9 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.liujun.io.nio.trans.bean.ChannelAttachMsg;
+import com.liujun.io.nio.trans.conn.TransConnectManager;
 import com.liujun.io.nio.trans.console.Config;
-import com.liujun.io.nio.trans.tran.TransProxyEndFile;
 import com.liujun.io.nio.trans.tran.TransProxyFile;
 
 /**
@@ -41,9 +42,16 @@ public class MultiplexerAllService implements Runnable {
      */
     private AtomicBoolean stop = new AtomicBoolean(false);
 
-    public MultiplexerAllService(Selector selector) {
+    /**
+     * 做连接管理信息
+    * @字段说明 transConn
+    */
+    private TransConnectManager transConn;
+
+    public MultiplexerAllService(Selector selector, TransConnectManager transConn) {
         // 进行多路选择器的复用
         this.selector = selector;
+        this.transConn = transConn;
     }
 
     public void stop() {
@@ -58,7 +66,6 @@ public class MultiplexerAllService implements Runnable {
                 // 在此通道阻塞1000毫秒
                 int readyChannels = selector.select(100);
 
-                System.out.println("键集操作数目:" + readyChannels);
                 if (readyChannels == 0) {
                     continue;
                 }
@@ -70,7 +77,7 @@ public class MultiplexerAllService implements Runnable {
 
                 while (iter.hasNext()) {
                     SelectionKey sekey = iter.next();
-                    iter.remove();
+
                     // 将当前的数据交给对应的方法来处理
                     try {
                         this.handleInput(sekey);
@@ -84,6 +91,7 @@ public class MultiplexerAllService implements Runnable {
                         }
                     }
 
+                    iter.remove();
                 }
 
             } catch (IOException e) {
@@ -95,33 +103,34 @@ public class MultiplexerAllService implements Runnable {
     private void handleInput(SelectionKey key) throws IOException {
 
         if (key.isValid()) {
-
             // 如果当前的连接已经用于套接字接受操作
             if (key.isAcceptable()) {
                 // 得到当前注册的通道
                 ServerSocketChannel ssc = (ServerSocketChannel) key.channel();
 
-                Integer type = (Integer) key.attachment();
+                ChannelAttachMsg type = (ChannelAttachMsg) key.attachment();
 
                 SocketChannel sc = ssc.accept();
 
                 // 设置为非阻塞
                 sc.configureBlocking(false);
 
-                if (Config.CONFIG_TYPE_FIRST.getKey() == type) {
-                    // 前端的数据进行读取，
-                    sc.register(selector, SelectionKey.OP_WRITE, type);
-                }
-
+                // 前端的数据进行读取，
+                sc.register(selector, SelectionKey.OP_WRITE, type);
             }
 
             // 如果当前的键为连接
             if (key.isConnectable()) {
                 // 得到当前
                 SocketChannel sc = (SocketChannel) key.channel();
+
                 // 如果已经完成连接
                 if (sc.finishConnect()) {
-                    Integer type = (Integer) key.attachment();
+                    ChannelAttachMsg type = (ChannelAttachMsg) key.attachment();
+
+                    // 注册后端连接
+                    transConn.regEndConn(new TransProxyFile());
+
                     sc.register(selector, SelectionKey.OP_WRITE, type);
                 }
             }
@@ -131,58 +140,44 @@ public class MultiplexerAllService implements Runnable {
                 // 得到当前
                 SocketChannel sc = (SocketChannel) key.channel();
 
-                int type = (Integer) key.attachment();
+                ChannelAttachMsg type = (ChannelAttachMsg) key.attachment();
 
-                // 如果为前端
-                if (Config.CONFIG_TYPE_FIRST.getKey() == type) {
+                // 如果前端连接
+                if (Config.CONFIG_TYPE_FIRST.getKey() == type.getKey()) {
 
-                    // 首先读取前端的数据生成到文件
-                    try {
-                        TransProxyFile.getInstance().tranFrom(sc);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        // 发生异常关闭流信息
-                        TransProxyFile.getInstance().close();
-                        throw e;
+                    if (null != type.getTransChannel()) {
+                        // 将A通道中的数据加载的内存A
+                        try {
+                            type.getTransChannel().getTransProxyA().tranFrom(sc);
+                            // 将内存B的数据写入到通道A
+                            type.getTransChannel().getTransProxyB().tranTo(sc);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            // 发生异常关闭流信息
+                            type.getTransChannel().getTransProxyA().close();
+                            type.getTransChannel().getTransProxyB().close();
+                            throw e;
+                        }
                     }
-
-                    // 将数据中后端通道中写入前端
-                    try {
-                        TransProxyEndFile.getInstance().tranTo(sc);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        // 发生异常关闭流信息
-                        TransProxyEndFile.getInstance().close();
-                        throw e;
-                    }
-
                 }
-                // 如果为后端
-                if (Config.CONFIG_TYPE_END.getKey() == type) {
-
-                    // 从后端进行数据的读取
-                    try {
-                        TransProxyEndFile.getInstance().tranFrom(sc);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        // 发生异常关闭流信息
-                        TransProxyEndFile.getInstance().close();
-                        throw e;
+                // 如果为后端连接
+                else if (Config.CONFIG_TYPE_END.getKey() == type.getKey()) {
+                    if (null != type.getTransChannel()) {
+                        try {
+                            // 将内存块B的数据读取到通道B
+                            type.getTransChannel().getTransProxyB().tranFrom(sc);
+                            // 将内存块A的数据写入到通道B
+                            type.getTransChannel().getTransProxyA().tranTo(sc);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            // 发生异常关闭流信息
+                            type.getTransChannel().getTransProxyB().close();
+                            type.getTransChannel().getTransProxyA().close();
+                            throw e;
+                        }
                     }
-
-                    // 向前端的数据进行写入
-                    try {
-                        TransProxyFile.getInstance().tranTo(sc);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        // 发生异常关闭流信息
-                        TransProxyFile.getInstance().close();
-                        throw e;
-                    }
-
                 }
             }
-
         }
     }
 
