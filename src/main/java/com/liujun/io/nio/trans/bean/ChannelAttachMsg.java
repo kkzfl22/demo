@@ -20,6 +20,12 @@ public class ChannelAttachMsg {
     private int key;
 
     /**
+     * 存储的id
+    * @字段说明 id
+    */
+    private int id;
+
+    /**
      * 传输通道信息
     * @字段说明 transChannel
     */
@@ -60,6 +66,27 @@ public class ChannelAttachMsg {
      */
     public void setTransChannel(FileMemonyChannel transChannel) {
         this.transChannel = transChannel;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("ChannelAttachMsg [key=");
+        builder.append(key);
+        builder.append(", id=");
+        builder.append(id);
+        builder.append(", transChannel=");
+        builder.append(transChannel);
+        builder.append("]");
+        return builder.toString();
     }
 
 }

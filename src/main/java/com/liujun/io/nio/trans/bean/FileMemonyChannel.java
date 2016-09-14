@@ -70,4 +70,15 @@ public class FileMemonyChannel {
         this.transProxyB = transProxyB;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("FileMemonyChannel [transProxyA=");
+        builder.append(transProxyA);
+        builder.append(", transProxyB=");
+        builder.append(transProxyB);
+        builder.append("]");
+        return builder.toString();
+    }
+
 }
