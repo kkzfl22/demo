@@ -3,12 +3,11 @@
  */
 package com.liujun.io.zip.ts;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 
 import org.junit.Before;
 import org.junit.Test;
