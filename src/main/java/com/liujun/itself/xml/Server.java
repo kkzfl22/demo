@@ -1,9 +1,14 @@
 package com.liujun.itself.xml;
 
-import javax.xml.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(namespace = "http://io.mycat/", name = "server")
@@ -38,7 +43,7 @@ public class Server {
 
         public List<Property> getProperty() {
             if (this.property == null) {
-                property = new ArrayList<>();
+                property = new ArrayList<Property>();
             }
             return property;
         }
@@ -72,7 +77,7 @@ public class Server {
 
         public List<Property> getProperty() {
             if (this.property == null) {
-                property = new ArrayList<>();
+                property = new ArrayList<Property>();
             }
             return property;
         }

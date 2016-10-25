@@ -50,12 +50,12 @@ public class ParseMsg {
         pars.setName("name");
         pars.setValue("小恩泽");
 
-        List<Property> property = new ArrayList<>();
+        List<Property> property = new ArrayList<Property>();
         property.add(pars);
         systems.setProperty(property);
         server.setSystem(systems);
 
-        List<User> userList = new ArrayList<>();
+        List<User> userList = new ArrayList<User>();
         Server.User serUser = new Server.User();
         serUser.setName("userName");
 
@@ -64,7 +64,7 @@ public class ParseMsg {
         pars2.setName("name2");
         pars2.setValue("小恩泽2");
 
-        List<Property> propertys = new ArrayList<>();
+        List<Property> propertys = new ArrayList<Property>();
         propertys.add(pars2);
 
         serUser.setProperty(propertys);
@@ -109,17 +109,15 @@ public class ParseMsg {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             //
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-            
-            
-            //此处文件冲突
+
+            // 此处文件冲突
             marshaller.setProperty("com.sun.xml.internal.bind.xmlHeaders",
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            
+
             // 指定dtd文件
             marshaller.setProperty("com.sun.xml.internal.bind.xmlHeaders",
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
-           
             // marshaller.setProperty("com.sun.xml.internal.bind.xmlHeaders",
             // String.format("<!DOCTYPE mycat:%1$s SYSTEM \"%1$s.dtd\">",
             // name));
