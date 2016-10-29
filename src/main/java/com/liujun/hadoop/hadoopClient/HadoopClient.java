@@ -16,7 +16,7 @@ public class HadoopClient {
     public static void main(String args[]) throws IOException {
         // 测试 创建新文件
         byte[] contents = "hello world 世界你好\n--created by eclipse\n".getBytes();
-        createFile("/test/first.txt", contents); // 或
+        createFile("/test/first23.txt", contents); // 或
         // createFile("hdfs://os1:8020/eclipse/first.txt", contents);
 
         // 测试 上传本地文件

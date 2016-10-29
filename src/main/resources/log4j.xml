@@ -62,7 +62,7 @@
 	
 	<!-- 根logger的设置     -->     
 	<root>       
-		<priority value="ALL"/>  
+		<priority value="DEBUG"/>  
 		<appender-ref ref="myConsole"/>       
 	</root> 
 	   

@@ -29,215 +29,215 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 public class BaseTest {
 
-	private Configuration config;
+    private Configuration config;
 
-	public BaseTest() {
-		config = HBaseConfiguration.create();
-		config.set("hbase.zookeeper.property.clientPort", "2181");
-		config.set("hbase.zookeeper.quorum", "192.168.3.130");
-		config.set("hbase.master", "192.168.3.130:600000");
-	}
+    public BaseTest() {
+        config = HBaseConfiguration.create();
+        config.set("hbase.zookeeper.property.clientPort", "2181");
+        config.set("hbase.zookeeper.quorum", "os1,os2,os3");
+        config.set("hbase.master", "os3:16000");
+    }
 
-	/**
-	 * 获得连接对象
-	 * 
-	 * @return
-	 */
-	public HConnection getConn() {
-		/**
-		 * 连接对象
-		 */
-		HConnection conn = null;
-		;
-		try {
-			conn = HConnectionManager.createConnection(config);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+    /**
+     * 获得连接对象
+     * 
+     * @return
+     */
+    public HConnection getConn() {
+        /**
+         * 连接对象
+         */
+        HConnection conn = null;
+        ;
+        try {
+            conn = HConnectionManager.createConnection(config);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-		return conn;
-	}
+        return conn;
+    }
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		String tableName = "localTest";
+        String tableName = "localTest";
 
-		BaseTest base = new BaseTest();
-		base.createTable(tableName);
-		base.testAddValue(tableName, "row1");
-		base.testAddValue(tableName, "row2");
-		base.testAddValue(tableName, "row3");
-		// base.deleteTable(tableName);
+        BaseTest base = new BaseTest();
+        base.createTable(tableName);
+        base.testAddValue(tableName, "row1");
+        base.testAddValue(tableName, "row2");
+        base.testAddValue(tableName, "row3");
+        // base.deleteTable(tableName);
 
-		base.delRowData(tableName, "row1");
+        base.delRowData(tableName, "row1");
 
-		// 输出rowd
-		base.queryAllData(tableName);
-		
-		base.testAddValue(tableName, "row4");
-		base.testAddValue(tableName, "row5");
-		
-		//进行过滤
-		base.queryFilter(tableName);
-	}
+        // 输出rowd
+        base.queryAllData(tableName);
 
-	/**
-	 * 创建表
-	 * 
-	 * @param table
-	 */
-	public void createTable(String table) {
-		System.out.println("创建表开始...");
-		try {
-			HBaseAdmin admin = new HBaseAdmin(config);
+        base.testAddValue(tableName, "row4");
+        base.testAddValue(tableName, "row5");
 
-			// 检查当前表是否存在
-			if (admin.tableExists(table)) {
-				admin.disableTable(table);
-				admin.deleteTable(table);
-				System.out.println("当前表存在，删除表成功");
-			}
+        // 进行过滤
+        base.queryFilter(tableName);
+    }
 
-			TableName tableName = TableName.valueOf(table);
-			// 创建表名描述信息
-			HTableDescriptor tableDescriptor = new HTableDescriptor(tableName);
+    /**
+     * 创建表
+     * 
+     * @param table
+     */
+    public void createTable(String table) {
+        System.out.println("创建表开始...");
+        try {
+            HBaseAdmin admin = new HBaseAdmin(config);
 
-			// 创建列族
-			tableDescriptor.addFamily(new HColumnDescriptor("column1"));
-			tableDescriptor.addFamily(new HColumnDescriptor("column2"));
-			tableDescriptor.addFamily(new HColumnDescriptor("column3"));
+            // 检查当前表是否存在
+            if (admin.tableExists(table)) {
+                admin.disableTable(table);
+                admin.deleteTable(table);
+                System.out.println("当前表存在，删除表成功");
+            }
 
-			admin.createTable(tableDescriptor);
-		} catch (MasterNotRunningException e) {
-			e.printStackTrace();
-		} catch (ZooKeeperConnectionException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+            TableName tableName = TableName.valueOf(table);
+            // 创建表名描述信息
+            HTableDescriptor tableDescriptor = new HTableDescriptor(tableName);
 
-		System.out.println("表创建完成....");
-	}
+            // 创建列族
+            tableDescriptor.addFamily(new HColumnDescriptor("column1"));
+            tableDescriptor.addFamily(new HColumnDescriptor("column2"));
+            tableDescriptor.addFamily(new HColumnDescriptor("column3"));
 
-	/**
-	 * 测试添加数据
-	 * 
-	 * @param tableName
-	 */
-	public void testAddValue(String tableName, String rowid) {
-		System.out.println("插入数据开始...");
+            admin.createTable(tableDescriptor);
+        } catch (MasterNotRunningException e) {
+            e.printStackTrace();
+        } catch (ZooKeeperConnectionException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-		HConnection conn = this.getConn();
-		try {
-			HTableInterface tableInf = conn.getTable(tableName);
+        System.out.println("表创建完成....");
+    }
 
-			Put put = new Put(rowid.getBytes());
-			put.add("column1".getBytes(), null, "aaa".getBytes());
-			put.add("column2".getBytes(), null, "bbb".getBytes());
-			put.add("column3".getBytes(), null, "ccc".getBytes());
+    /**
+     * 测试添加数据
+     * 
+     * @param tableName
+     */
+    public void testAddValue(String tableName, String rowid) {
+        System.out.println("插入数据开始...");
 
-			tableInf.put(put);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				conn.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+        HConnection conn = this.getConn();
+        try {
+            HTableInterface tableInf = conn.getTable(tableName);
 
-	/**
-	 * 删除表
-	 * 
-	 * @param tableName
-	 */
-	public void deleteTable(String tableName) {
-		HBaseAdmin admin;
-		try {
-			admin = new HBaseAdmin(config);
-			admin.disableTable(tableName);
-			admin.deleteTable(tableName);
-		} catch (MasterNotRunningException e) {
-			e.printStackTrace();
-		} catch (ZooKeeperConnectionException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+            Put put = new Put(rowid.getBytes());
+            put.add("column1".getBytes(), null, "aaa".getBytes());
+            put.add("column2".getBytes(), null, "bbb".getBytes());
+            put.add("column3".getBytes(), null, "ccc".getBytes());
 
-	/**
-	 * 删除行数据
-	 * 
-	 * @param tableName
-	 * @param rowid
-	 */
-	@SuppressWarnings("unchecked")
-	public void delRowData(String tableName, String rowid) {
-		try {
-			HTable tableDel = new HTable(config, tableName);
-			List delList = new ArrayList();
+            tableInf.put(put);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-			delList.add(new Delete(rowid.getBytes()));
+    /**
+     * 删除表
+     * 
+     * @param tableName
+     */
+    public void deleteTable(String tableName) {
+        HBaseAdmin admin;
+        try {
+            admin = new HBaseAdmin(config);
+            admin.disableTable(tableName);
+            admin.deleteTable(tableName);
+        } catch (MasterNotRunningException e) {
+            e.printStackTrace();
+        } catch (ZooKeeperConnectionException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-			tableDel.delete(delList);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    /**
+     * 删除行数据
+     * 
+     * @param tableName
+     * @param rowid
+     */
+    @SuppressWarnings("unchecked")
+    public void delRowData(String tableName, String rowid) {
+        try {
+            HTable tableDel = new HTable(config, tableName);
+            List delList = new ArrayList();
 
-	/**
-	 * 查询一个表中的所有数据
-	 * 
-	 * @param tableName
-	 */
-	public void queryAllData(String tableName) {
-		HConnection conn = getConn();
-		try {
-			HTableInterface tableInf = conn.getTable(tableName);
+            delList.add(new Delete(rowid.getBytes()));
 
-			ResultScanner scan = tableInf.getScanner(new Scan());
+            tableDel.delete(delList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-			for (Result result : scan) {
-				System.out.println("获得到rowkey:" + new String(result.getRow()));
-				// 遍历列，输出
-				for (KeyValue keyValue : result.raw()) {
-					System.out.println(
-							"列:" + new String(keyValue.getFamily()) + "====值：" + new String(keyValue.getValue()));
-				}
-			}
+    /**
+     * 查询一个表中的所有数据
+     * 
+     * @param tableName
+     */
+    public void queryAllData(String tableName) {
+        HConnection conn = getConn();
+        try {
+            HTableInterface tableInf = conn.getTable(tableName);
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+            ResultScanner scan = tableInf.getScanner(new Scan());
 
-	public void queryFilter(String tableName) {
-		HConnection conn = getConn();
-		try {
-			HTableInterface tableInf = conn.getTable(tableName);
+            for (Result result : scan) {
+                System.out.println("获得到rowkey:" + new String(result.getRow()));
+                // 遍历列，输出
+                for (KeyValue keyValue : result.raw()) {
+                    System.out.println(
+                            "列:" + new String(keyValue.getFamily()) + "====值：" + new String(keyValue.getValue()));
+                }
+            }
 
-			Filter filter = new SingleColumnValueFilter(Bytes.toBytes("column1"), null, CompareOp.EQUAL,
-					Bytes.toBytes("aaa"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-			Scan scan = new Scan();
-			scan.setFilter(filter);
+    public void queryFilter(String tableName) {
+        HConnection conn = getConn();
+        try {
+            HTableInterface tableInf = conn.getTable(tableName);
 
-			ResultScanner scanResult = tableInf.getScanner(scan);
+            Filter filter = new SingleColumnValueFilter(Bytes.toBytes("column1"), null, CompareOp.EQUAL,
+                    Bytes.toBytes("aaa"));
 
-			for (Result result : scanResult) {
-				System.out.println("获得到rowkey:" + new String(result.getRow()));
-				// 遍历列，输出
-				for (KeyValue keyValue : result.raw()) {
-					System.out.println(
-							"列:" + new String(keyValue.getFamily()) + "====值：" + new String(keyValue.getValue()));
-				}
-			}
+            Scan scan = new Scan();
+            scan.setFilter(filter);
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+            ResultScanner scanResult = tableInf.getScanner(scan);
+
+            for (Result result : scanResult) {
+                System.out.println("获得到rowkey:" + new String(result.getRow()));
+                // 遍历列，输出
+                for (KeyValue keyValue : result.raw()) {
+                    System.out.println(
+                            "列:" + new String(keyValue.getFamily()) + "====值：" + new String(keyValue.getValue()));
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
