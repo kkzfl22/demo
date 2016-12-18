@@ -33,7 +33,7 @@ public class MultiplexerTimeService implements Runnable {
             // 1,打开ServerSocketChannel，用于监听客户端的连接，它是所有客户端连接的父管道
             serverchannel = ServerSocketChannel.open();
             // 2,绑定监听端口，设置连接为非阻塞模式
-            serverchannel.socket().bind(new InetSocketAddress("www.liujun.com", port));
+            serverchannel.socket().bind(new InetSocketAddress("localhost", port));
             serverchannel.configureBlocking(false);
             // 3,创建多路复用器
             selector = Selector.open();
