@@ -72,20 +72,12 @@ public class PageMemory {
     * @return 1,可分配 0，不能
     * @创建日期 2016年12月19日
     */
-    public int checkNeedChunk(int chunkNum) {
-        // 1,检查当前容量是否已经满
-        if (this.canUseChunkNum == 0) {
-            return MemonryConsole.FULL.getFlag();
-        } else {
-            // 如果当前可分配的内存块满足要求
-            if (this.canUseChunkNum >= chunkNum) {
-                return MemonryConsole.CANUSE.getFlag();
-            }
-            // 如果当前的可分配内存不够
-            else {
-                return MemonryConsole.NOT_ENOUGH.getFlag();
-            }
+    public boolean checkNeedChunk(int chunkNum) {
+        // 如果当前可分配的内存块满足要求
+        if (this.canUseChunkNum >= chunkNum) {
+            return true;
         }
+        return false;
     }
 
     /**
@@ -160,8 +152,7 @@ public class PageMemory {
     * @param chunkNum
     * @创建日期 2016年12月19日
     */
-    public void recycleBuffer(ByteBuffer parentBuffer, int chunkStart,
-            int chunkNum) {
+    public boolean recycleBuffer(ByteBuffer parentBuffer, int chunkStart, int chunkNum) {
         if (this.buffer == parentBuffer) {
             // 如果加锁失败，则执行其他代码
             if (!isLock.compareAndSet(false, true)) {
@@ -179,7 +170,11 @@ public class PageMemory {
                 isLock.set(false);
             }
 
+            return true;
+
         }
+
+        return false;
     }
 
     @SuppressWarnings("restriction")
@@ -195,11 +190,9 @@ public class PageMemory {
         // 获得内存buffer
         sun.nio.ch.DirectBuffer thisNavBuf = (DirectBuffer) bufferItem2;
         // attachment对象在buf.slice();的时候将attachment对象设置为总的buff对象
-        sun.nio.ch.DirectBuffer parentBuf = (DirectBuffer) thisNavBuf
-                .attachment();
+        sun.nio.ch.DirectBuffer parentBuf = (DirectBuffer) thisNavBuf.attachment();
         // 已经使用的地址减去父类最开始的地址，即为所有已经使用的地址，除以chunkSize得到chunk当前开始的地址,得到整块内存开始的地址
-        int startChunk = (int) ((thisNavBuf.address() - parentBuf.address())
-                / 256);
+        int startChunk = (int) ((thisNavBuf.address() - parentBuf.address()) / 256);
 
         // 归还当前buffer2的内存
         page.recycleBuffer((ByteBuffer) parentBuf, startChunk, 2);

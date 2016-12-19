@@ -28,12 +28,6 @@ public class MemoryPool {
     private final int CHUNK_SIZE;
 
     /**
-     * 当前已经分配的大小
-    * @字段说明 allocationIndex
-    */
-    private int allocationIndex = 0;
-
-    /**
      * 用来构建内存池对象信息
     * 构造方法
     * @param chunkSize
@@ -46,8 +40,7 @@ public class MemoryPool {
         POOL = new PageMemory[poolSize];
         // 进行每个chunk的页面的分配内存操作
         for (int i = 0; i < poolSize; i++) {
-            POOL[i] = new PageMemory(ByteBuffer.allocateDirect(memorySize),
-                    CHUNK_SIZE);
+            POOL[i] = new PageMemory(ByteBuffer.allocateDirect(memorySize), CHUNK_SIZE);
         }
     }
 
@@ -59,12 +52,55 @@ public class MemoryPool {
     * @创建日期 2016年12月19日
     */
     public ByteBuffer allocate(int size) {
-        //计算需要的chunk大小
-        int needChunk = size % CHUNK_SIZE == 0 ? size / CHUNK_SIZE
-                : size / CHUNK_SIZE + 1;
-        //
+        // 计算需要的chunk大小
+        int needChunk = size % CHUNK_SIZE == 0 ? size / CHUNK_SIZE : size / CHUNK_SIZE + 1;
+        // 取得内存页信息
+        PageMemory page = null;
+        for (PageMemory pageMemory : POOL) {
+            if (pageMemory.checkNeedChunk(needChunk)) {
+                page = pageMemory;
+                break;
+            }
+        }
 
+        // 如果能找合适的内存空间，则进行分配
+        if (null != page) {
+            // 针对当前的chunk进行内存的分配操作
+            ByteBuffer buffer = page.alloactionMemory(needChunk);
+            return buffer;
+        }
         return null;
+
+    }
+
+    /**
+     * 进行内存的归还操作 
+    * 方法描述
+    * @param buffer
+    * @创建日期 2016年12月19日
+    */
+    @SuppressWarnings("restriction")
+    public void recycle(ByteBuffer buffer) {
+        // 获得内存buffer
+        sun.nio.ch.DirectBuffer thisNavBuf = (sun.nio.ch.DirectBuffer) buffer;
+        // attachment对象在buf.slice();的时候将attachment对象设置为总的buff对象
+        sun.nio.ch.DirectBuffer parentBuf = (sun.nio.ch.DirectBuffer) thisNavBuf.attachment();
+        // 已经使用的地址减去父类最开始的地址，即为所有已经使用的地址，除以chunkSize得到chunk当前开始的地址,得到整块内存开始的地址
+        int startChunk = (int) ((thisNavBuf.address() - parentBuf.address()) / CHUNK_SIZE);
+        // 计算chunk归还的数量
+        int chunkNum = buffer.capacity() / CHUNK_SIZE;
+
+        boolean recyProc = false;
+
+        for (PageMemory pageMemory : POOL) {
+            if ((recyProc = pageMemory.recycleBuffer((ByteBuffer) parentBuf, startChunk, chunkNum)) == true) {
+                break;
+            }
+        }
+
+        if (!recyProc) {
+            System.out.println("memory recycle fail");
+        }
     }
 
 }
