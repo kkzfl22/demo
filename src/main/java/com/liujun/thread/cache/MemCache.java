@@ -48,7 +48,7 @@ public class MemCache<A, V> implements Computable<A, V> {
 
 				FutureTask<V> ft = new FutureTask<V>(eval);
 
-				f = cache.put(arg, ft);
+				f = cache.putIfAbsent(arg, ft);
 
 				if (f == null) {
 					f = ft;
